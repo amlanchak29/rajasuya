@@ -45,14 +45,23 @@ export interface Progress {
   oathReady: boolean;
 }
 
-export function progressOf(state: State, id: string, me: Player): Progress {
+/** With `veiled`, advisory readouts use only what the player may see:
+ * the steal bar ignores the rival's hidden leverage (the engine's actual
+ * refusal is the surprise), and atRisk is computed but must not be shown. */
+export function progressOf(
+  state: State,
+  id: string,
+  me: Player,
+  veiled = false,
+): Progress {
   const f = state.figures[id];
   const rival = other(me);
   const obligation = f.obligation[me];
   const leverage = f.leverage[me];
   const allied = f.allegiance === me;
   const rivalAllied = f.allegiance === rival;
-  const clears = !f.locked && obligation >= petitionBar(state, id, me);
+  const bar = veiled ? PETITION_MIN : petitionBar(state, id, me);
+  const clears = !f.locked && obligation >= bar;
   return {
     obligation,
     leverage,

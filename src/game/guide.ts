@@ -17,9 +17,15 @@ export interface GuideLine {
   text: string;
 }
 
-export function guideLine(state: State, human: Player): GuideLine | null {
+export function guideLine(
+  state: State,
+  human: Player,
+  veiled = false,
+): GuideLine | null {
   const ids = Object.keys(state.figures);
-  const prog = ids.map((id) => [id, progressOf(state, id, human)] as const);
+  const prog = ids.map(
+    (id) => [id, progressOf(state, id, human, veiled)] as const,
+  );
 
   const seals = prog.filter(
     ([id, p]) => p.locked && state.figures[id].allegiance === human,
@@ -28,7 +34,8 @@ export function guideLine(state: State, human: Player): GuideLine | null {
   const anyObligation = prog.some(([, p]) => !p.locked && p.obligation > 0);
   const petitionReady = prog.find(([, p]) => p.petitionReady);
   const oathReady = prog.find(([, p]) => p.oathReady);
-  const atRisk = prog.find(([, p]) => p.atRisk);
+  // atRisk reads the rival's numbers — never surface it under the veil.
+  const atRisk = veiled ? undefined : prog.find(([, p]) => p.atRisk);
   const stealReady = prog.find(([, p]) => p.stealReady);
 
   if (seals.length >= 3) return null;
@@ -76,8 +83,8 @@ export function guideLine(state: State, human: Player): GuideLine | null {
         id: "petition",
         text:
           `${FIGURE_NAME[id]} owes you enough to hear you. Yachana — the ` +
-          "petition — claims his allegiance: openly for legitimacy, or " +
-          "hidden to keep it out of the chronicle.",
+          "petition — claims his allegiance: quietly and cheap, or before " +
+          "the court at a higher price, for legitimacy.",
       };
     }
     if (anyObligation)
@@ -85,7 +92,7 @@ export function guideLine(state: State, human: Player): GuideLine | null {
         id: "build",
         text:
           "Debt opens doors. Each hospitality adds 2 to what a king owes " +
-          `you; at ${PETITION_MIN} he will hear your petition.`,
+          `you; at ${PETITION_MIN} he will hear a quiet petition.`,
       };
     return {
       id: "hospitality",

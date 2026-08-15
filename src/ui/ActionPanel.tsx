@@ -3,6 +3,7 @@ import {
   OPEN,
   PASS,
   VERBS,
+  YACHANA_NEED,
   type Action,
   type Player,
   type State,
@@ -46,7 +47,7 @@ function PathLadder({ p }: { p: Progress }) {
     [
       {
         label: "Hospitality",
-        detail: `he owes you ${p.obligation} of the ${PETITION_MIN} a petition needs`,
+        detail: `he owes you ${p.obligation} — a hidden petition asks ${YACHANA_NEED[HIDDEN]}, an open one ${YACHANA_NEED[OPEN]}`,
         done: p.obligation >= PETITION_MIN || p.allied || p.locked,
         now: !p.allied && !p.locked && p.obligation < PETITION_MIN,
       },
@@ -108,6 +109,7 @@ export default function ActionPanel({
   state,
   legal,
   human,
+  veiled,
   isHumanTurn,
   selected,
   onAct,
@@ -115,6 +117,7 @@ export default function ActionPanel({
   state: State;
   legal: Action[];
   human: Player;
+  veiled: boolean;
   isHumanTurn: boolean;
   selected: string | null;
   onAct: (a: Action) => void;
@@ -164,7 +167,7 @@ export default function ActionPanel({
             </div>
           </div>
 
-          <PathLadder p={progressOf(state, selected, human)} />
+          <PathLadder p={progressOf(state, selected, human, veiled)} />
 
           <ul className="mt-2 flex flex-col gap-2">
             {VERB_CHOICES.map(([verb, vis]) => {
@@ -178,7 +181,7 @@ export default function ActionPanel({
                 isHumanTurn && legal.some((a) => sameAction(a, action));
               const blocked =
                 !isLegal && isHumanTurn
-                  ? explainBlocked(state, { ...action, actor: human })
+                  ? explainBlocked(state, { ...action, actor: human }, veiled)
                   : null;
               return (
                 <li key={`${verb}-${vis}`}>

@@ -34,9 +34,26 @@ if "--round2" in sys.argv:
         ("digvijaya-15t-5o", 15, 5),
     ]
 
-# Round 4: bind parked (it capped open-oath ceilings at (16,6) — zero
-# oath wins in the expedient mirror). Confirm flip alone holds digvijaya.
+# Round 5 (round 3/4's 16t rows were invalid — see play()): the (16,6)
+# rule variants, measured with the fixed instrument. Control included so
+# it must reproduce round 1's (16,6) numbers.
 RULES = {}
+if "--round5" in sys.argv:
+    FLIP = {E.OPEN: 4, E.HIDDEN: 3}
+    BASE = {E.OPEN: 3, E.HIDDEN: 4}
+    CONFIGS = [
+        ("control-16t-6o", 16, 6),
+        ("flip-16t-6o", 16, 6),
+        ("bind-16t-6o", 16, 6),
+        ("flip+bind-16t-6o", 16, 6),
+    ]
+    RULES = {
+        "control-16t-6o": (BASE, False),
+        "flip-16t-6o": (FLIP, False),
+        "bind-16t-6o": (BASE, True),
+        "flip+bind-16t-6o": (FLIP, True),
+    }
+
 if "--round4" in sys.argv:
     CONFIGS = [("flip-16t-6o", 16, 6)]
     RULES = {"flip-16t-6o": ({E.OPEN: 4, E.HIDDEN: 3}, False)}
@@ -69,8 +86,12 @@ MATCHUPS = [
 ]
 
 
-def play(seed, di, dm):
-    state = E.initial_state(seed)
+def play(seed, di, dm, turns, oaths):
+    # Pass the clock explicitly: initial_state's defaults were captured at
+    # module load, so overriding E.TURN_LIMIT does NOT reach state anymore.
+    # (Learned the hard way — rounds 3/4 first ran every "16t" config at
+    # 12t/4o. Check the instrument before tuning the design.)
+    state = E.initial_state(seed, turns, oaths)
     rng = random.Random(seed * 31 + 7)
     dharma = {E.INDRAPRASTHA: di, E.MAGADHA: dm}
     passes = 0
@@ -88,21 +109,21 @@ def play(seed, di, dm):
     return state, passes, contested
 
 
-def run_matchup(n, di, dm):
+def run_matchup(n, di, dm, turns, oaths):
     res = collections.Counter()
     method = collections.Counter()
     oath_end_turns = []
     passes_total = 0
     contested_counts = collections.Counter()
     for seed in range(n):
-        st, passes, contested = play(seed, di, dm)
+        st, passes, contested = play(seed, di, dm, turns, oaths)
         w = st["winner"]
         res[w] += 1
         passes_total += passes
         for k in contested:
             contested_counts[k] += 1
         if w in E.PLAYERS:
-            if st["oaths"][w] >= E.OATHS_TO_WIN:
+            if st["oaths"][w] >= st["oaths_to_win"]:
                 method["oath"] += 1
                 oath_end_turns.append(st["turn"])
             else:
@@ -125,7 +146,8 @@ def main():
         all_contested = collections.Counter()
         games_total = 0
         for di, dm in MATCHUPS:
-            res, method, mean_turn, passes, contested = run_matchup(n, di, dm)
+            res, method, mean_turn, passes, contested = run_matchup(
+                n, di, dm, turns, oaths)
             games_total += n
             all_contested.update(contested)
             i, m = res[E.INDRAPRASTHA], res[E.MAGADHA]

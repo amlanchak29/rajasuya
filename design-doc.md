@@ -45,8 +45,8 @@ Vows are visible to the opponent, who plays to trigger them. Shishupala can only
 | Verb | Effect | Visibility |
 |---|---|---|
 | **Satkara** | Hospitality. +2 obligation, +1 legitimacy. | open only |
-| **Yachana** | Petition. Claims allegiance. Needs obligation ≥3 open, ≥4 hidden. Open grants +2 legitimacy. | either |
-| **Mantrana** | Private counsel. +2 leverage. | hidden only |
+| **Yachana** | Petition. Claims allegiance. Needs obligation ≥4 open, ≥3 hidden (r10 price flip — legitimacy costs tempo). Open grants +2 legitimacy. | either |
+| **Mantrana** | Private counsel. +2 leverage. Also defends: a king bound by counsel does not turn — stealing a rival's ally requires beating the rival's leverage on him (r10). | hidden only |
 | **Pratigya** | The oath. Locks the figure permanently. Open counts toward victory and grants +3 legitimacy. Hidden counts toward nothing — it seals the king away from your rival, and increments your concealed-oath count. | either |
 
 Pratigya requires allegiance **and** either leverage ≥2 **or** obligation ≥6 — a man you hold something over, or a man too deep in your debt to refuse.
@@ -210,7 +210,7 @@ Shortlisted, deliberately not in the base game. Each must be a module the core d
 
 **Legitimacy and force as separate non-convertible tracks.** Force does not exist in the current model at all. Rajasuya is about acknowledgment, so this may simply not belong here.
 
-**The Yachana price flip** (hidden 3, open 4 — legitimacy as something you pay tempo for). Tested during the r9 work: directionally right, not needed once the open-oath rule landed. In the back pocket if human play shows expedient still too strong.
+**The Yachana price flip** (hidden 3, open 4 — legitimacy as something you pay tempo for). Tested during the r9 work: directionally right, not needed once the open-oath rule landed. **Shipped in r10** after human play found the visibility choice fake (open was cheaper *and* paid legitimacy); measured balanced at both clocks alongside counsel-binds.
 
 ---
 
@@ -228,3 +228,4 @@ Shortlisted, deliberately not in the base game. Each must be a module the core d
 | r7 | Victory checked on complete rounds | first-mover 63/32 → 48/43 |
 | r8 | Live-quadrant sessions; pass floor | stalls 4–8% → 0 |
 | r9 | Only open oaths count toward victory; agent gains `sealed` weight | righteous vs expedient 29/63 → 75/80, flavor intact |
+| r10 | Yachana price flip (hidden 3 / open 4); counsel binds (rival leverage raises the theft bar); clock and oath bar moved into state; digvijaya mode (16t/6o) | flip+bind 74/84 at (12,4), 80/79 at (16,6); (16,6) the only balanced long config — 5-oath bars favored expedient 60–73% |

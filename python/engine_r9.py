@@ -46,14 +46,16 @@ TURN_LIMIT = 12
 OATHS_TO_WIN = 4
 SESSIONS_PER_TURN = 2
 
-# r10 candidates, measured by variant_study.py --round3 before defaulting.
-# YACHANA_NEED: obligation a petition requires, by visibility. The "price
-# flip" ({OPEN: 4, HIDDEN: 3}) makes legitimacy cost tempo (design doc §10).
-YACHANA_NEED = {OPEN: 3, HIDDEN: 4}
+# r10 (shipped 2026-08-16; file name retained). Measured by
+# variant_study.py rounds 3 and 5; combined flip+bind reads 74/84 at
+# (12,4) and 80/79 at (16,6) — even within noise at both clocks.
+# YACHANA_NEED: the price flip — a hidden petition is cheaper than an
+# open one, so legitimacy costs tempo (design doc §10, now shipped).
+YACHANA_NEED = {OPEN: 4, HIDDEN: 3}
 # COUNSEL_BINDS: a king bound by counsel does not turn — petitioning a
 # figure allied to your rival additionally requires beating the rival's
 # leverage on him. Gives Mantrana a defensive second job.
-COUNSEL_BINDS = False
+COUNSEL_BINDS = True
 
 
 def other(p):

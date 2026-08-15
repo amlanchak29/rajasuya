@@ -82,7 +82,9 @@ function Game({ setup, onNewGame }: { setup: Setup; onNewGame: () => void }) {
   );
   const { ceremony, dismiss } = useOathCeremony(state, setup.human);
   const guide =
-    state.winner === null && isHumanTurn ? guideLine(state, setup.human) : null;
+    state.winner === null && isHumanTurn
+      ? guideLine(state, setup.human, setup.veiled)
+      : null;
 
   const aiOpen = aiAct !== null && aiAct.action.visibility === "open";
   const aiToastText =
@@ -123,6 +125,7 @@ function Game({ setup, onNewGame }: { setup: Setup; onNewGame: () => void }) {
             state={state}
             legal={legal}
             human={setup.human}
+            veiled={setup.veiled}
             isHumanTurn={isHumanTurn}
             selected={selected}
             onAct={act}

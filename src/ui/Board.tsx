@@ -91,7 +91,7 @@ function FigureCard({
   const f = state.figures[id];
   const seal = sealOf(state, id);
   const allied = !f.locked && f.allegiance !== null;
-  const p = progressOf(state, id, human);
+  const p = progressOf(state, id, human, veiled);
   const rival = other(human);
 
   return (

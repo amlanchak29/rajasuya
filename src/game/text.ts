@@ -88,7 +88,11 @@ function hospitalityHint(missing: number): string {
   return n === 1 ? "One more hospitality" : `${n} more hospitality`;
 }
 
-export function explainBlocked(state: State, action: Action): Blocked {
+export function explainBlocked(
+  state: State,
+  action: Action,
+  veiled = false,
+): Blocked {
   const target = action.target as string;
   const f = state.figures[target];
   const me = action.actor;
@@ -113,12 +117,20 @@ export function explainBlocked(state: State, action: Action): Blocked {
       COUNSEL_BINDS && f.allegiance !== null && f.allegiance !== me
         ? f.allegiance
         : null;
+    const defended = defender !== null && f.leverage[defender] > 0;
     if (defender !== null) need += f.leverage[defender];
+    // Veiled mode must not leak the rival's hidden leverage through the
+    // bar number — name the defense, never its size.
+    if (defended && veiled)
+      return {
+        kind: "gap",
+        text: "His allegiance is defended by counsel — the bar sits higher than the debt you can see.",
+      };
     return {
       kind: "gap",
       text:
         `${hospitalityHint(need - f.obligation[me])} opens the ${action.visibility} petition (obligation ${f.obligation[me]} of ${need}` +
-        (defender !== null && f.leverage[defender] > 0
+        (defended
           ? ` — his allegiance is defended by counsel).`
           : `).`),
     };
