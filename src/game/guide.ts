@@ -4,7 +4,12 @@
  * seal, then retires. Teaching stays in situ per design doc §5: this is a
  * single line of counsel, never a rules screen. */
 import type { Player, State } from "../engine/engine";
-import { progressOf } from "./progress";
+import {
+  OATH_LEVERAGE,
+  OATH_OBLIGATION,
+  PETITION_MIN,
+  progressOf,
+} from "./progress";
 import { FIGURE_NAME } from "./text";
 
 export interface GuideLine {
@@ -23,10 +28,38 @@ export function guideLine(state: State, human: Player): GuideLine | null {
   const anyObligation = prog.some(([, p]) => !p.locked && p.obligation > 0);
   const petitionReady = prog.find(([, p]) => p.petitionReady);
   const oathReady = prog.find(([, p]) => p.oathReady);
+  const atRisk = prog.find(([, p]) => p.atRisk);
+  const stealReady = prog.find(([, p]) => p.stealReady);
 
-  if (seals.length >= 2) return null;
+  if (seals.length >= 3) return null;
 
-  if (seals.length === 1)
+  if (seals.length >= 1) {
+    if (oathReady) {
+      const [id] = oathReady;
+      return {
+        id: "oath",
+        text: `${FIGURE_NAME[id]} is ready to swear — Pratigya seals him forever.`,
+      };
+    }
+    if (atRisk) {
+      const [id] = atRisk;
+      return {
+        id: "defend",
+        text:
+          `${FIGURE_NAME[id]} is yours — but your rival's debt on him ` +
+          "clears the petition bar. Allegiance can be stolen; only the " +
+          "oath is forever. Seal him, or accept the risk.",
+      };
+    }
+    if (stealReady) {
+      const [id] = stealReady;
+      return {
+        id: "steal",
+        text:
+          `${FIGURE_NAME[id]} leans to your rival but is not sworn. He ` +
+          "owes you enough to hear you — your petition would turn him.",
+      };
+    }
     return {
       id: "vow-trap",
       text:
@@ -34,6 +67,7 @@ export function guideLine(state: State, human: Player): GuideLine | null {
         "Shishupala in secret shuts Shalya's door on himself. Play their " +
         "vows against them.",
     };
+  }
 
   if (allies.length === 0) {
     if (petitionReady) {
@@ -51,7 +85,7 @@ export function guideLine(state: State, human: Player): GuideLine | null {
         id: "build",
         text:
           "Debt opens doors. Each hospitality adds 2 to what a king owes " +
-          "you; at 3 he will hear your petition.",
+          `you; at ${PETITION_MIN} he will hear your petition.`,
       };
     return {
       id: "hospitality",
@@ -76,7 +110,7 @@ export function guideLine(state: State, human: Player): GuideLine | null {
     id: "leverage",
     text:
       "Allegiance can still be stolen — only an oath is forever. Mantrana " +
-      "— private counsel — builds leverage; at 2, or obligation 6, the " +
-      "oath is yours to take.",
+      `— private counsel — builds leverage; at ${OATH_LEVERAGE}, or ` +
+      `obligation ${OATH_OBLIGATION}, the oath is yours to take.`,
   };
 }

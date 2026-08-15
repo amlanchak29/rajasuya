@@ -1,6 +1,6 @@
 import {
   INDRAPRASTHA,
-  MAGADHA,
+  other,
   QUADRANTS,
   VOW_TEXT,
   type Player,
@@ -8,12 +8,68 @@ import {
   type State,
 } from "../engine/engine";
 import { sealOf } from "../game/useGame";
-import { progressOf } from "../game/progress";
+import {
+  OATH_LEVERAGE,
+  OATH_OBLIGATION,
+  PETITION_MIN,
+  progressOf,
+} from "../game/progress";
 import { FIGURE_NAME, PLAYER_NAME, QUADRANT_NAME } from "../game/text";
 import { PORTRAITS } from "./assets";
 
 const dot = (p: Player) => (p === INDRAPRASTHA ? "bg-indra" : "bg-magadha");
 const tint = (p: Player) => (p === INDRAPRASTHA ? "text-indra" : "text-magadha");
+
+/** A stat as a filling bar. Ticks mark the thresholds that matter, so
+ * "how close is he" is a glance, not arithmetic. */
+function StatBar({
+  label,
+  title,
+  value,
+  max,
+  ticks,
+  fill,
+  rivalValue,
+  rivalTint,
+}: {
+  label: string;
+  title: string;
+  value: number;
+  max: number;
+  ticks: number[];
+  fill: string;
+  rivalValue: number | null;
+  rivalTint: string;
+}) {
+  return (
+    <div className="flex items-center gap-2" title={title}>
+      <span className="w-13 shrink-0 font-chrome text-[10px] uppercase tracking-wide text-leaf-faint">
+        {label}
+      </span>
+      <span className="relative h-1.5 grow overflow-hidden rounded-full bg-line/60">
+        <span
+          className={`absolute inset-y-0 left-0 rounded-full ${fill} motion-safe:transition-all motion-safe:duration-500`}
+          style={{ width: `${Math.min(100, (value / max) * 100)}%` }}
+        />
+        {ticks.map((t) => (
+          <span
+            key={t}
+            className="absolute inset-y-0 w-px bg-leaf-dim/70"
+            style={{ left: `${(t / max) * 100}%` }}
+          />
+        ))}
+      </span>
+      <span className="w-4 shrink-0 text-right font-chrome text-xs text-leaf-dim">
+        {value}
+      </span>
+      {rivalValue !== null && (
+        <span className={`w-4 shrink-0 text-right font-chrome text-xs ${rivalTint}`}>
+          {rivalValue}
+        </span>
+      )}
+    </div>
+  );
+}
 
 function FigureCard({
   id,
@@ -36,6 +92,7 @@ function FigureCard({
   const seal = sealOf(state, id);
   const allied = !f.locked && f.allegiance !== null;
   const p = progressOf(state, id, human);
+  const rival = other(human);
 
   return (
     <button
@@ -93,45 +150,58 @@ function FigureCard({
       </p>
 
       {/* Engine state is fully open except the log (HANDOVER §5); veiled
-          mode is a UI choice that hides the rival's columns. */}
-      <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 font-chrome text-xs text-leaf-faint">
-        <span title="Obligation — debts of hospitality owed to each claim">
-          owes{" "}
-          {veiled ? (
-            <span className={tint(human)}>{f.obligation[human]}</span>
-          ) : (
-            <>
-              <span className={tint(INDRAPRASTHA)}>
-                {f.obligation[INDRAPRASTHA]}
+          mode is a UI choice that hides the rival's columns. Bars show the
+          human's progress; ticks mark the petition and oath thresholds. */}
+      <div className="mt-1.5 flex flex-col gap-1">
+        <StatBar
+          label="owes"
+          title={`Obligation — hospitality's debt. Ticks: petition (${PETITION_MIN}) and the oath's debt route (${OATH_OBLIGATION}).`}
+          value={f.obligation[human]}
+          max={OATH_OBLIGATION}
+          ticks={[PETITION_MIN, OATH_OBLIGATION]}
+          fill={human === INDRAPRASTHA ? "bg-indra" : "bg-magadha"}
+          rivalValue={veiled ? null : f.obligation[rival]}
+          rivalTint={tint(rival)}
+        />
+        <StatBar
+          label="leverage"
+          title={`Leverage — private counsel's hold. At ${OATH_LEVERAGE}, the oath is yours to take.`}
+          value={f.leverage[human]}
+          max={OATH_LEVERAGE}
+          ticks={[]}
+          fill="bg-shadow-blue"
+          rivalValue={veiled ? null : f.leverage[rival]}
+          rivalTint={tint(rival)}
+        />
+        {(p.oathReady || p.atRisk || p.stealReady || p.petitionReady) && (
+          <div className="flex flex-wrap gap-1 pt-0.5">
+            {p.oathReady && (
+              <span className="rounded border border-indra/60 px-1.5 py-px text-[10px] uppercase tracking-wide text-indra">
+                ready for the oath
               </span>
-              {" · "}
-              <span className={tint(MAGADHA)}>{f.obligation[MAGADHA]}</span>
-            </>
-          )}
-        </span>
-        <span title="Leverage — what each claim holds over him from private counsel">
-          leverage{" "}
-          {veiled ? (
-            <span className={tint(human)}>{f.leverage[human]}</span>
-          ) : (
-            <>
-              <span className={tint(INDRAPRASTHA)}>
-                {f.leverage[INDRAPRASTHA]}
+            )}
+            {p.atRisk && !veiled && (
+              <span
+                className={`rounded border px-1.5 py-px text-[10px] uppercase tracking-wide ${rival === INDRAPRASTHA ? "border-indra/60 text-indra" : "border-magadha/60 text-magadha"}`}
+                title="Your ally — but the rival's obligation clears the petition bar. Only the oath makes him safe."
+              >
+                at risk
               </span>
-              {" · "}
-              <span className={tint(MAGADHA)}>{f.leverage[MAGADHA]}</span>
-            </>
-          )}
-        </span>
-        {p.oathReady && (
-          <span className="rounded border border-indra/60 px-1.5 py-px text-[10px] uppercase tracking-wide text-indra">
-            ready for the oath
-          </span>
-        )}
-        {!p.oathReady && p.petitionReady && (
-          <span className="rounded border border-leaf-dim/60 px-1.5 py-px text-[10px] uppercase tracking-wide text-leaf-dim">
-            ready to petition
-          </span>
+            )}
+            {p.stealReady && (
+              <span
+                className="rounded border border-indra/60 px-1.5 py-px text-[10px] uppercase tracking-wide text-leaf"
+                title="Allied to your rival, but your petition would turn him."
+              >
+                can be turned
+              </span>
+            )}
+            {!p.oathReady && p.petitionReady && (
+              <span className="rounded border border-leaf-dim/60 px-1.5 py-px text-[10px] uppercase tracking-wide text-leaf-dim">
+                ready to petition
+              </span>
+            )}
+          </div>
         )}
           </div>
         </div>

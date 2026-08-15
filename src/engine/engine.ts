@@ -46,6 +46,17 @@ export const TURN_LIMIT = 12;
 export const OATHS_TO_WIN = 4;
 export const SESSIONS_PER_TURN = 2;
 
+// r10 candidates — mirrors python/engine_r9.py; measured by
+// variant_study.py before defaults change. YACHANA_NEED: obligation a
+// petition requires, by visibility. COUNSEL_BINDS: petitioning a figure
+// allied to your rival additionally requires beating the rival's
+// leverage on him.
+export const YACHANA_NEED: Record<Visibility, number> = {
+  [OPEN]: 3,
+  [HIDDEN]: 4,
+};
+export const COUNSEL_BINDS = false;
+
 export function other(p: Player): Player {
   return p === INDRAPRASTHA ? MAGADHA : INDRAPRASTHA;
 }
@@ -326,7 +337,13 @@ function baseRequirements(state: State, action: Action): boolean {
 
   if (f.locked) return false;
   if (verb === SATKARA) return true;
-  if (verb === YACHANA) return f.obligation[actor] >= (vis === OPEN ? 3 : 4);
+  if (verb === YACHANA) {
+    let need = YACHANA_NEED[vis];
+    if (COUNSEL_BINDS && f.allegiance !== null && f.allegiance !== actor) {
+      need += f.leverage[f.allegiance];
+    }
+    return f.obligation[actor] >= need;
+  }
   if (verb === MANTRANA) return true;
   if (verb === PRATIGYA) {
     if (f.allegiance !== actor) return false;

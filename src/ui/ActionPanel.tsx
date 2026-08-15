@@ -9,7 +9,13 @@ import {
   type Verb,
   type Visibility,
 } from "../engine/engine";
-import { progressOf, type Progress } from "../game/progress";
+import {
+  OATH_LEVERAGE,
+  OATH_OBLIGATION,
+  PETITION_MIN,
+  progressOf,
+  type Progress,
+} from "../game/progress";
 import {
   explainBlocked,
   FIGURE_NAME,
@@ -40,9 +46,9 @@ function PathLadder({ p }: { p: Progress }) {
     [
       {
         label: "Hospitality",
-        detail: `he owes you ${p.obligation} of the 3 a petition needs`,
-        done: p.obligation >= 3 || p.allied || p.locked,
-        now: !p.allied && !p.locked && p.obligation < 3,
+        detail: `he owes you ${p.obligation} of the ${PETITION_MIN} a petition needs`,
+        done: p.obligation >= PETITION_MIN || p.allied || p.locked,
+        now: !p.allied && !p.locked && p.obligation < PETITION_MIN,
       },
       {
         label: "Petition",
@@ -52,13 +58,13 @@ function PathLadder({ p }: { p: Progress }) {
             ? "his allegiance lies with your rival — petition to steal it"
             : "claims his allegiance",
         done: p.allied,
-        now: p.petitionReady || (p.rivalAllied && p.obligation >= 3),
+        now: p.petitionReady || p.stealReady,
       },
       {
         label: "The oath",
         detail: p.locked
           ? "he is sworn"
-          : `leverage ${p.leverage} of 2 (counsel), or obligation ${p.obligation} of 6`,
+          : `leverage ${p.leverage} of ${OATH_LEVERAGE} (counsel), or obligation ${p.obligation} of ${OATH_OBLIGATION}`,
         done: p.locked,
         now: p.oathReady,
       },

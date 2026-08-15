@@ -46,6 +46,15 @@ TURN_LIMIT = 12
 OATHS_TO_WIN = 4
 SESSIONS_PER_TURN = 2
 
+# r10 candidates, measured by variant_study.py --round3 before defaulting.
+# YACHANA_NEED: obligation a petition requires, by visibility. The "price
+# flip" ({OPEN: 4, HIDDEN: 3}) makes legitimacy cost tempo (design doc §10).
+YACHANA_NEED = {OPEN: 3, HIDDEN: 4}
+# COUNSEL_BINDS: a king bound by counsel does not turn — petitioning a
+# figure allied to your rival additionally requires beating the rival's
+# leverage on him. Gives Mantrana a defensive second job.
+COUNSEL_BINDS = False
+
 
 def other(p):
     return MAGADHA if p == INDRAPRASTHA else INDRAPRASTHA
@@ -260,7 +269,10 @@ def _base_requirements(state, action):
     if verb == SATKARA:
         return True
     if verb == YACHANA:
-        return f["obligation"][actor] >= (3 if vis == OPEN else 4)
+        need = YACHANA_NEED[vis]
+        if COUNSEL_BINDS and f["allegiance"] not in (None, actor):
+            need += f["leverage"][f["allegiance"]]
+        return f["obligation"][actor] >= need
     if verb == MANTRANA:
         return True
     if verb == PRATIGYA:

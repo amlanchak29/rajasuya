@@ -3,8 +3,10 @@
  * English, no religious content. */
 import {
   blockingVows,
+  COUNSEL_BINDS,
   inSession,
   VOW_TEXT,
+  YACHANA_NEED,
   type Action,
   type Player,
   type State,
@@ -106,10 +108,19 @@ export function explainBlocked(state: State, action: Action): Blocked {
   }
 
   if (action.verb === "yachana") {
-    const need = action.visibility === "open" ? 3 : 4;
+    let need = YACHANA_NEED[action.visibility];
+    const defender =
+      COUNSEL_BINDS && f.allegiance !== null && f.allegiance !== me
+        ? f.allegiance
+        : null;
+    if (defender !== null) need += f.leverage[defender];
     return {
       kind: "gap",
-      text: `${hospitalityHint(need - f.obligation[me])} opens the ${action.visibility} petition (obligation ${f.obligation[me]} of ${need}).`,
+      text:
+        `${hospitalityHint(need - f.obligation[me])} opens the ${action.visibility} petition (obligation ${f.obligation[me]} of ${need}` +
+        (defender !== null && f.leverage[defender] > 0
+          ? ` — his allegiance is defended by counsel).`
+          : `).`),
     };
   }
   if (action.verb === "pratigya") {

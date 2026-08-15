@@ -34,6 +34,33 @@ if "--round2" in sys.argv:
         ("digvijaya-15t-5o", 15, 5),
     ]
 
+# Round 4: bind parked (it capped open-oath ceilings at (16,6) — zero
+# oath wins in the expedient mirror). Confirm flip alone holds digvijaya.
+RULES = {}
+if "--round4" in sys.argv:
+    CONFIGS = [("flip-16t-6o", 16, 6)]
+    RULES = {"flip-16t-6o": ({E.OPEN: 4, E.HIDDEN: 3}, False)}
+
+# Round 3: rule variants at the base clock. RULES maps config name ->
+# (yachana_need, counsel_binds); clock stays (12, 4) unless suffixed.
+if "--round3" in sys.argv:
+    FLIP = {E.OPEN: 4, E.HIDDEN: 3}
+    BASE = {E.OPEN: 3, E.HIDDEN: 4}
+    CONFIGS = [
+        ("r9-control", 12, 4),
+        ("flip", 12, 4),
+        ("bind", 12, 4),
+        ("flip+bind", 12, 4),
+        ("flip+bind-16t-6o", 16, 6),
+    ]
+    RULES = {
+        "r9-control": (BASE, False),
+        "flip": (FLIP, False),
+        "bind": (BASE, True),
+        "flip+bind": (FLIP, True),
+        "flip+bind-16t-6o": (FLIP, True),
+    }
+
 MATCHUPS = [
     ("expedient", "expedient"),
     ("righteous", "righteous"),
@@ -91,6 +118,8 @@ def main():
     for name, turns, oaths in CONFIGS:
         E.TURN_LIMIT = turns
         E.OATHS_TO_WIN = oaths
+        if name in RULES:
+            E.YACHANA_NEED, E.COUNSEL_BINDS = RULES[name]
         print(f"\n===== {name} (turns={turns}, oaths={oaths}, N={n}) =====",
               flush=True)
         all_contested = collections.Counter()
