@@ -8,6 +8,7 @@ import {
   type State,
 } from "../engine/engine";
 import { sealOf } from "../game/useGame";
+import { progressOf } from "../game/progress";
 import { FIGURE_NAME, PLAYER_NAME, QUADRANT_NAME } from "../game/text";
 
 const dot = (p: Player) => (p === INDRAPRASTHA ? "bg-indra" : "bg-magadha");
@@ -16,12 +17,14 @@ const tint = (p: Player) => (p === INDRAPRASTHA ? "text-indra" : "text-magadha")
 function FigureCard({
   id,
   state,
+  human,
   inSess,
   selected,
   onSelect,
 }: {
   id: string;
   state: State;
+  human: Player;
   inSess: boolean;
   selected: boolean;
   onSelect: (id: string) => void;
@@ -29,6 +32,7 @@ function FigureCard({
   const f = state.figures[id];
   const seal = sealOf(state, id);
   const allied = !f.locked && f.allegiance !== null;
+  const p = progressOf(state, id, human);
 
   return (
     <button
@@ -79,7 +83,7 @@ function FigureCard({
       {/* Both sides' numbers shown — the engine treats state as open
           except the log; visible-vs-hidden is an open design question
           (HANDOVER §5). Flip here if human play decides otherwise. */}
-      <div className="mt-1.5 flex gap-4 font-chrome text-xs text-leaf-faint">
+      <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 font-chrome text-xs text-leaf-faint">
         <span title="Obligation — debts of hospitality owed to each claim">
           owes{" "}
           <span className={tint(INDRAPRASTHA)}>{f.obligation[INDRAPRASTHA]}</span>
@@ -92,6 +96,16 @@ function FigureCard({
           {" · "}
           <span className={tint(MAGADHA)}>{f.leverage[MAGADHA]}</span>
         </span>
+        {p.oathReady && (
+          <span className="rounded border border-indra/60 px-1.5 py-px text-[10px] uppercase tracking-wide text-indra">
+            ready for the oath
+          </span>
+        )}
+        {!p.oathReady && p.petitionReady && (
+          <span className="rounded border border-leaf-dim/60 px-1.5 py-px text-[10px] uppercase tracking-wide text-leaf-dim">
+            ready to petition
+          </span>
+        )}
       </div>
     </button>
   );
@@ -100,11 +114,19 @@ function FigureCard({
 export default function Board({
   state,
   sessions,
+  human,
+  justLit,
+  litStamp,
   selected,
   onSelect,
 }: {
   state: State;
   sessions: Set<Quadrant>;
+  human: Player;
+  /** Quadrants that just came into session — get a one-shot wake pulse. */
+  justLit: Set<Quadrant>;
+  /** Changes on every session redraw so the pulse retriggers via remount. */
+  litStamp: number;
   selected: string | null;
   onSelect: (id: string) => void;
 }) {
@@ -117,10 +139,10 @@ export default function Board({
         );
         return (
           <section
-            key={q}
+            key={justLit.has(q) ? `${q}-${litStamp}` : q}
             className={`flex flex-col gap-2 rounded-lg border p-3 motion-safe:transition-all motion-safe:duration-700 ${
               inSess
-                ? "lamplit border-line-bright"
+                ? `lamplit border-line-bright ${justLit.has(q) ? "motion-safe:court-wake" : ""}`
                 : "border-line bg-court-closed"
             }`}
           >
@@ -145,6 +167,7 @@ export default function Board({
                 key={id}
                 id={id}
                 state={state}
+                human={human}
                 inSess={inSess}
                 selected={selected === id}
                 onSelect={onSelect}

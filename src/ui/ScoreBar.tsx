@@ -49,8 +49,8 @@ function Claim({
         className={`mt-1 flex items-center gap-4 font-chrome text-sm text-leaf-dim ${alignRight ? "justify-end" : ""}`}
       >
         <OathPips count={state.oaths[player]} color={pipColor} />
-        <span title="Legitimacy — decides the game at the twelfth turn">
-          regard {state.legitimacy[player]}
+        <span title="Legitimacy — the world's regard; decides the game at the twelfth turn">
+          legitimacy {state.legitimacy[player]}
         </span>
         <span className="text-shadow-blue" title="Oaths sworn in secret — held, but not advancing the sacrifice">
           in shadow {state.concealed_oaths[player]}
@@ -82,6 +82,9 @@ export default function ScoreBar({
             : isHumanTurn
               ? `Your move — ${state.actions_remaining} of 3 acts remain`
               : `${PLAYER_NAME[state.active_player]} is acting…`}
+        </div>
+        <div className="mt-0.5 font-chrome text-[11px] text-leaf-faint">
+          Win: four open oaths, or the legitimacy lead after turn 12
         </div>
       </div>
       <Claim

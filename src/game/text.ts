@@ -73,30 +73,55 @@ export function logLine(entry: {
   return `${PLAYER_NAME[entry.actor]} ${LOG_VERB[entry.verb]} ${FIGURE_NAME[entry.target]}`;
 }
 
-/** Why a closed action is closed — blocking_vows() is the tutorial
- * (design doc §5). Vow blocks are quoted in the vow-holder's terms;
- * everything else states the unmet requirement plainly. */
-export function explainBlocked(state: State, action: Action): string {
+/** Two very different kinds of "no": a vow (permanent, the interesting
+ * kind — blocking_vows() is the tutorial, design doc §5) and a gap you
+ * can close with play. The UI styles them differently. */
+export interface Blocked {
+  kind: "locked" | "court" | "vow" | "gap";
+  text: string;
+}
+
+function hospitalityHint(missing: number): string {
+  const n = Math.ceil(missing / 2);
+  return n === 1 ? "One more hospitality" : `${n} more hospitality`;
+}
+
+export function explainBlocked(state: State, action: Action): Blocked {
   const target = action.target as string;
   const f = state.figures[target];
   const me = action.actor;
 
-  if (f.locked) return "He is sworn. Nothing more can be asked of him.";
-  if (!inSession(state).has(f.quadrant)) return "His court is not in session.";
+  if (f.locked)
+    return {
+      kind: "locked",
+      text: "He is sworn. Nothing more can be asked of him.",
+    };
+  if (!inSession(state).has(f.quadrant))
+    return { kind: "court", text: "His court is not in session." };
 
   const vows = blockingVows(state, action);
   if (vows.length > 0) {
     const [holder, vowId] = vows[0];
-    return `${FIGURE_NAME[holder]} ${VOW_TEXT[vowId]}.`;
+    return { kind: "vow", text: `${FIGURE_NAME[holder]} ${VOW_TEXT[vowId]}.` };
   }
 
   if (action.verb === "yachana") {
     const need = action.visibility === "open" ? 3 : 4;
-    return `A ${action.visibility} petition needs obligation ${need}; he owes you ${f.obligation[me]}.`;
+    return {
+      kind: "gap",
+      text: `${hospitalityHint(need - f.obligation[me])} opens the ${action.visibility} petition (obligation ${f.obligation[me]} of ${need}).`,
+    };
   }
   if (action.verb === "pratigya") {
-    if (f.allegiance !== me) return "He has not given you his allegiance.";
-    return `The oath needs leverage 2 or obligation 6; you hold ${f.leverage[me]} and ${f.obligation[me]}.`;
+    if (f.allegiance !== me)
+      return {
+        kind: "gap",
+        text: "Petition him first — the oath needs his allegiance.",
+      };
+    return {
+      kind: "gap",
+      text: `Counsel him for leverage (${f.leverage[me]} of 2), or reach obligation 6 (${hospitalityHint(6 - f.obligation[me]).toLowerCase()}).`,
+    };
   }
-  return "Not possible now.";
+  return { kind: "gap", text: "Not possible now." };
 }

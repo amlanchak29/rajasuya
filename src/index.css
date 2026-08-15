@@ -37,6 +37,24 @@ html {
   outline-offset: 2px;
 }
 
+/* One-shot flare when a court comes into session. */
+@utility court-wake {
+  animation: court-wake 1.1s ease-out 1;
+}
+
+@keyframes court-wake {
+  0% {
+    box-shadow:
+      0 0 0 1px var(--color-indra),
+      0 0 28px rgba(217, 164, 65, 0.28);
+  }
+  100% {
+    box-shadow:
+      0 0 0 0 transparent,
+      0 0 0 transparent;
+  }
+}
+
 /* Lamplight pool over a court in session. */
 .lamplit {
   background:

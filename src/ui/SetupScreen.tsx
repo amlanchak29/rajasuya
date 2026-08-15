@@ -5,8 +5,8 @@ import type { Setup } from "../game/useGame";
 import { PLAYER_EPITHET, PLAYER_NAME } from "../game/text";
 
 const DHARMA_LINE: Record<Dharma, string> = {
-  expedient: "Will swear kings in shadow and spend the world's regard.",
-  righteous: "Wants the world's regard and pays for it in the open.",
+  expedient: "Will swear kings in shadow and spend legitimacy to do it.",
+  righteous: "Courts legitimacy and pays for it by staying in the open.",
 };
 
 export default function SetupScreen({
@@ -33,8 +33,8 @@ export default function SetupScreen({
         </h1>
         <p className="mt-2 font-body italic text-leaf-dim">
           Two claims to paramountcy. Neither sits on a throne. First to four
-          oaths sworn before the world, or the greater regard at the twelfth
-          turn.
+          oaths sworn before the world, or the greater legitimacy at the
+          twelfth turn.
         </p>
       </header>
 
