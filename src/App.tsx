@@ -1,41 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  INDRAPRASTHA,
-  MAGADHA,
-  OATHS_TO_WIN,
-  QUADRANTS,
-  type Quadrant,
-  type State,
-} from "./engine/engine";
+import { QUADRANTS, type Player, type Quadrant, type State } from "./engine/engine";
 import { useGame, type Setup } from "./game/useGame";
 import { guideLine } from "./game/guide";
-import { PLAYER_NAME, QUADRANT_NAME } from "./game/text";
+import { logLine, PLAYER_NAME, QUADRANT_NAME } from "./game/text";
 import SetupScreen from "./ui/SetupScreen";
-import { SIGILS } from "./ui/assets";
 import ScoreBar from "./ui/ScoreBar";
 import GuideStrip from "./ui/GuideStrip";
 import Board from "./ui/Board";
 import ActionPanel from "./ui/ActionPanel";
 import Chronicle from "./ui/Chronicle";
-
-function verdict(state: State): { title: string; line: string } {
-  const w = state.winner;
-  if (w === "draw")
-    return {
-      title: "No decision",
-      line: "Neither claim prevailed. The kings keep their own counsel.",
-    };
-  if (w === null) return { title: "", line: "" };
-  if (state.oaths[w] >= OATHS_TO_WIN)
-    return {
-      title: PLAYER_NAME[w],
-      line: `Four kings acknowledged ${PLAYER_NAME[w]} before the world. The sacrifice is theirs.`,
-    };
-  return {
-    title: PLAYER_NAME[w],
-    line: `At the twelfth turn legitimacy decided it: ${state.legitimacy[INDRAPRASTHA]} to ${state.legitimacy[MAGADHA]}.`,
-  };
-}
+import Ceremony, { type OathCeremony } from "./ui/Ceremony";
+import Summary from "./ui/Summary";
+import { PORTRAITS } from "./ui/assets";
 
 /** Announce session redraws and flare the newly lit courts — the redraw
  * happens after every act (in_session hashes actions_remaining), so it
@@ -67,26 +43,76 @@ function useSessionNarration(sessions: Set<Quadrant>, gameOver: boolean) {
   return { note, justLit, litStamp };
 }
 
+/** Watch for figures becoming locked: open oaths (in the public log) get
+ * a ceremony for either actor; a concealed oath gets its private version
+ * only when it is the human's own — the rival's secret stays secret. */
+function useOathCeremony(state: State, human: Player) {
+  const [ceremony, setCeremony] = useState<OathCeremony | null>(null);
+  const prev = useRef(state);
+  useEffect(() => {
+    const before = prev.current;
+    prev.current = state;
+    if (before === state) return;
+    for (const [id, f] of Object.entries(state.figures)) {
+      if (!f.locked || before.figures[id]?.locked || f.allegiance === null)
+        continue;
+      const open = state.log.some(
+        (e) => e.verb === "pratigya" && e.target === id,
+      );
+      if (open || f.allegiance === human) {
+        setCeremony((c) => ({
+          figure: id,
+          actor: f.allegiance!,
+          open,
+          stamp: (c?.stamp ?? 0) + 1,
+        }));
+      }
+    }
+  }, [state, human]);
+  return { ceremony, dismiss: () => setCeremony(null) };
+}
+
 function Game({ setup, onNewGame }: { setup: Setup; onNewGame: () => void }) {
-  const { state, legal, sessions, act, isHumanTurn } = useGame(setup);
+  const { state, legal, sessions, act, isHumanTurn, ai, aiAct } =
+    useGame(setup);
   const [selected, setSelected] = useState<string | null>(null);
   const { note, justLit, litStamp } = useSessionNarration(
     sessions,
     state.winner !== null,
   );
+  const { ceremony, dismiss } = useOathCeremony(state, setup.human);
   const guide =
     state.winner === null && isHumanTurn ? guideLine(state, setup.human) : null;
-  const v = verdict(state);
+
+  const aiOpen = aiAct !== null && aiAct.action.visibility === "open";
+  const aiToastText =
+    aiAct === null
+      ? null
+      : aiAct.action.verb === "pass"
+        ? `${PLAYER_NAME[ai]} waits out the session.`
+        : aiOpen
+          ? logLine({
+              actor: aiAct.action.actor,
+              verb: aiAct.action.verb,
+              target: aiAct.action.target as string,
+            })
+          : `${PLAYER_NAME[ai]} moves unseen.`;
 
   return (
     <div className="flex min-h-screen flex-col">
-      <ScoreBar state={state} human={setup.human} isHumanTurn={isHumanTurn} />
+      <ScoreBar
+        state={state}
+        human={setup.human}
+        veiled={setup.veiled}
+        isHumanTurn={isHumanTurn}
+      />
       <GuideStrip guide={guide} sessionNote={note} />
       <div className="flex grow flex-col gap-3 p-3 lg:flex-row">
         <Board
           state={state}
           sessions={sessions}
           human={setup.human}
+          veiled={setup.veiled}
           justLit={justLit}
           litStamp={litStamp}
           selected={selected}
@@ -105,38 +131,32 @@ function Game({ setup, onNewGame }: { setup: Setup; onNewGame: () => void }) {
         </aside>
       </div>
 
-      {state.winner !== null && (
-        <div className="fixed inset-0 grid place-items-center bg-hall/80 p-6">
-          <div className="max-w-md rounded-lg border border-line-bright bg-court p-8 text-center">
-            {state.winner !== "draw" && (
-              <img
-                src={SIGILS[state.winner]}
-                alt=""
-                className="mx-auto mb-4 h-20 w-20 rounded-full object-cover"
-              />
-            )}
-            <div
-              className={`font-display text-4xl ${
-                state.winner === INDRAPRASTHA
-                  ? "text-indra"
-                  : state.winner === MAGADHA
-                    ? "text-magadha"
-                    : "text-leaf"
-              }`}
-            >
-              {v.title}
-            </div>
-            <p className="mt-3 font-body text-lg italic text-leaf-dim">
-              {v.line}
-            </p>
-            <button
-              onClick={onNewGame}
-              className="mt-6 rounded bg-indra px-6 py-2 font-chrome font-bold text-hall hover:brightness-110"
-            >
-              New game
-            </button>
-          </div>
+      {aiToastText !== null && state.winner === null && (
+        <div
+          key={aiAct!.stamp}
+          className="toast-fade pointer-events-none fixed bottom-6 left-1/2 z-10 flex -translate-x-1/2 items-center gap-3 rounded-lg border border-line-bright bg-court px-4 py-2 shadow-lg"
+        >
+          {aiOpen && aiAct!.action.target !== null && (
+            <img
+              src={PORTRAITS[aiAct!.action.target]}
+              alt=""
+              className="h-10 w-8 rounded object-cover object-top"
+            />
+          )}
+          <span
+            className={`font-body italic ${aiOpen ? "text-leaf-dim" : "text-shadow-blue"}`}
+          >
+            {aiToastText}
+          </span>
         </div>
+      )}
+
+      {ceremony !== null && (
+        <Ceremony ceremony={ceremony} state={state} onClose={dismiss} />
+      )}
+
+      {state.winner !== null && ceremony === null && (
+        <Summary state={state} onNewGame={onNewGame} />
       )}
     </div>
   );
@@ -147,7 +167,7 @@ export default function App() {
   if (!setup) return <SetupScreen onBegin={setSetup} />;
   return (
     <Game
-      key={`${setup.human}-${setup.aiDharma}-${setup.seed}`}
+      key={`${setup.human}-${setup.aiDharma}-${setup.seed}-${setup.veiled}`}
       setup={setup}
       onNewGame={() => setSetup(null)}
     />

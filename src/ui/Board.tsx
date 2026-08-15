@@ -19,6 +19,7 @@ function FigureCard({
   id,
   state,
   human,
+  veiled,
   inSess,
   selected,
   onSelect,
@@ -26,6 +27,7 @@ function FigureCard({
   id: string;
   state: State;
   human: Player;
+  veiled: boolean;
   inSess: boolean;
   selected: boolean;
   onSelect: (id: string) => void;
@@ -90,21 +92,36 @@ function FigureCard({
           : "No vow binds him."}
       </p>
 
-      {/* Both sides' numbers shown — the engine treats state as open
-          except the log; visible-vs-hidden is an open design question
-          (HANDOVER §5). Flip here if human play decides otherwise. */}
+      {/* Engine state is fully open except the log (HANDOVER §5); veiled
+          mode is a UI choice that hides the rival's columns. */}
       <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 font-chrome text-xs text-leaf-faint">
         <span title="Obligation — debts of hospitality owed to each claim">
           owes{" "}
-          <span className={tint(INDRAPRASTHA)}>{f.obligation[INDRAPRASTHA]}</span>
-          {" · "}
-          <span className={tint(MAGADHA)}>{f.obligation[MAGADHA]}</span>
+          {veiled ? (
+            <span className={tint(human)}>{f.obligation[human]}</span>
+          ) : (
+            <>
+              <span className={tint(INDRAPRASTHA)}>
+                {f.obligation[INDRAPRASTHA]}
+              </span>
+              {" · "}
+              <span className={tint(MAGADHA)}>{f.obligation[MAGADHA]}</span>
+            </>
+          )}
         </span>
         <span title="Leverage — what each claim holds over him from private counsel">
           leverage{" "}
-          <span className={tint(INDRAPRASTHA)}>{f.leverage[INDRAPRASTHA]}</span>
-          {" · "}
-          <span className={tint(MAGADHA)}>{f.leverage[MAGADHA]}</span>
+          {veiled ? (
+            <span className={tint(human)}>{f.leverage[human]}</span>
+          ) : (
+            <>
+              <span className={tint(INDRAPRASTHA)}>
+                {f.leverage[INDRAPRASTHA]}
+              </span>
+              {" · "}
+              <span className={tint(MAGADHA)}>{f.leverage[MAGADHA]}</span>
+            </>
+          )}
         </span>
         {p.oathReady && (
           <span className="rounded border border-indra/60 px-1.5 py-px text-[10px] uppercase tracking-wide text-indra">
@@ -127,6 +144,7 @@ export default function Board({
   state,
   sessions,
   human,
+  veiled,
   justLit,
   litStamp,
   selected,
@@ -135,6 +153,7 @@ export default function Board({
   state: State;
   sessions: Set<Quadrant>;
   human: Player;
+  veiled: boolean;
   /** Quadrants that just came into session — get a one-shot wake pulse. */
   justLit: Set<Quadrant>;
   /** Changes on every session redraw so the pulse retriggers via remount. */
@@ -180,6 +199,7 @@ export default function Board({
                 id={id}
                 state={state}
                 human={human}
+                veiled={veiled}
                 inSess={inSess}
                 selected={selected === id}
                 onSelect={onSelect}

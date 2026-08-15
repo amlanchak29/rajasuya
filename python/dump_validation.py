@@ -51,10 +51,10 @@ MATCHUPS = [
 ]
 
 
-def play_game(seed):
+def play_game(seed, turns=12, oaths=4):
     dharmas = MATCHUPS[seed % len(MATCHUPS)]
     rng = random.Random(seed)
-    state = E.initial_state(seed)
+    state = E.initial_state(seed, turns, oaths)
     steps = []
     while state["winner"] is None:
         dharma = dharmas[state["active_player"]]
@@ -69,8 +69,8 @@ def play_game(seed):
             "action": action,
             "state": state,
         })
-    return {"seed": seed, "dharmas": dharmas,
-            "winner": state["winner"], "steps": steps}
+    return {"seed": seed, "config": {"turns": turns, "oaths": oaths},
+            "dharmas": dharmas, "winner": state["winner"], "steps": steps}
 
 
 def main():
@@ -81,6 +81,12 @@ def main():
             game = play_game(seed)
             f.write(json.dumps(game, separators=(",", ":")) + "\n")
             print(f"seed {seed}: winner={game['winner']} "
+                  f"steps={len(game['steps'])}", flush=True)
+        # Digvijaya variant coverage: the shipped long config (16, 6).
+        for seed in range(n, n + 12):
+            game = play_game(seed, turns=16, oaths=6)
+            f.write(json.dumps(game, separators=(",", ":")) + "\n")
+            print(f"seed {seed} (16t/6o): winner={game['winner']} "
                   f"steps={len(game['steps'])}", flush=True)
 
 

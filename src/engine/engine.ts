@@ -87,6 +87,8 @@ export interface LogEntry {
 
 export interface State {
   turn: number;
+  turn_limit: number;
+  oaths_to_win: number;
   active_player: Player;
   actions_remaining: number;
   seed: number;
@@ -130,7 +132,16 @@ export function inSession(state: State): Set<Quadrant> {
   return new Set(picksOut);
 }
 
-export function initialState(seed = 0): State {
+/** Variant support (digvijaya mode): the clock and the oath bar live in
+ * state so apply() stays pure. Measured variants only — (16, 6) is the
+ * one long config that held the dharma balance (79/78 at N=80/matchup);
+ * 5-oath bars at any length favored expedient 60-73%. See
+ * python/variant_study.py. */
+export function initialState(
+  seed = 0,
+  turns = TURN_LIMIT,
+  oaths = OATHS_TO_WIN,
+): State {
   const fig = (
     quadrant: Quadrant,
     vows: Vow[] = [],
@@ -148,6 +159,8 @@ export function initialState(seed = 0): State {
 
   return {
     turn: 1,
+    turn_limit: turns,
+    oaths_to_win: oaths,
     active_player: INDRAPRASTHA,
     actions_remaining: ACTIONS_PER_TURN,
     seed,
@@ -478,7 +491,7 @@ function creditLiberator(s: State, actor: Player): void {
 }
 
 function checkWinner(s: State): Player | "draw" | null {
-  const reached = PLAYERS.filter((p) => s.oaths[p] >= OATHS_TO_WIN);
+  const reached = PLAYERS.filter((p) => s.oaths[p] >= s.oaths_to_win);
   if (reached.length > 0) {
     const best = Math.max(...reached.map((p) => s.oaths[p]));
     const tied = reached.filter((p) => s.oaths[p] === best);
@@ -486,7 +499,7 @@ function checkWinner(s: State): Player | "draw" | null {
     const [a, b] = tied.map((p) => s.legitimacy[p]);
     return a === b ? "draw" : a > b ? tied[0] : tied[1];
   }
-  if (s.turn > TURN_LIMIT) {
+  if (s.turn > s.turn_limit) {
     const a = s.legitimacy[INDRAPRASTHA];
     const b = s.legitimacy[MAGADHA];
     return a === b ? "draw" : a > b ? INDRAPRASTHA : MAGADHA;

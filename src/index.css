@@ -55,6 +55,49 @@ html {
   }
 }
 
+/* Ceremony overlay: one slow breath in. */
+@utility ceremony-fade {
+  animation: ceremony-fade 0.5s ease-out 1;
+}
+
+@keyframes ceremony-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* AI act toast: in, hold a beat, out. Duration tracks AI_BEAT_MS. */
+@utility toast-fade {
+  animation: toast-fade 1.35s ease-in-out 1 forwards;
+}
+
+@keyframes toast-fade {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 6px);
+  }
+  12% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  82% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast-fade,
+  .ceremony-fade {
+    animation: none;
+  }
+}
+
 /* Lamplight pool over a court in session. */
 .lamplit {
   background:

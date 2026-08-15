@@ -1,18 +1,24 @@
 import {
   INDRAPRASTHA,
   MAGADHA,
-  OATHS_TO_WIN,
-  TURN_LIMIT,
   type Player,
   type State,
 } from "../engine/engine";
 import { PLAYER_NAME } from "../game/text";
 import { SIGILS } from "./assets";
 
-function OathPips({ count, color }: { count: number; color: string }) {
+function OathPips({
+  count,
+  goal,
+  color,
+}: {
+  count: number;
+  goal: number;
+  color: string;
+}) {
   return (
-    <span className="inline-flex gap-1" title={`${count} of ${OATHS_TO_WIN} oaths sworn before the world`}>
-      {Array.from({ length: OATHS_TO_WIN }, (_, i) => (
+    <span className="inline-flex gap-1" title={`${count} of ${goal} oaths sworn before the world`}>
+      {Array.from({ length: goal }, (_, i) => (
         <span
           key={i}
           className={`inline-block h-2.5 w-2.5 rounded-full border ${
@@ -28,11 +34,13 @@ function Claim({
   state,
   player,
   isHuman,
+  hideShadow,
   alignRight,
 }: {
   state: State;
   player: Player;
   isHuman: boolean;
+  hideShadow: boolean;
   alignRight?: boolean;
 }) {
   const gold = player === INDRAPRASTHA;
@@ -57,13 +65,22 @@ function Claim({
       <div
         className={`mt-1 flex items-center gap-4 font-chrome text-sm text-leaf-dim ${alignRight ? "justify-end" : ""}`}
       >
-        <OathPips count={state.oaths[player]} color={pipColor} />
+        <OathPips
+          count={state.oaths[player]}
+          goal={state.oaths_to_win}
+          color={pipColor}
+        />
         <span title="Legitimacy — the world's regard; decides the game at the twelfth turn">
           legitimacy {state.legitimacy[player]}
         </span>
-        <span className="text-shadow-blue" title="Oaths sworn in secret — held, but not advancing the sacrifice">
-          in shadow {state.concealed_oaths[player]}
-        </span>
+        {!hideShadow && (
+          <span
+            className="text-shadow-blue"
+            title="Oaths sworn in secret — held, but not advancing the sacrifice"
+          >
+            in shadow {state.concealed_oaths[player]}
+          </span>
+        )}
       </div>
       </div>
     </div>
@@ -73,18 +90,25 @@ function Claim({
 export default function ScoreBar({
   state,
   human,
+  veiled,
   isHumanTurn,
 }: {
   state: State;
   human: Player;
+  veiled: boolean;
   isHumanTurn: boolean;
 }) {
   return (
     <header className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 border-b border-line px-4 py-3">
-      <Claim state={state} player={INDRAPRASTHA} isHuman={human === INDRAPRASTHA} />
+      <Claim
+        state={state}
+        player={INDRAPRASTHA}
+        isHuman={human === INDRAPRASTHA}
+        hideShadow={veiled && human !== INDRAPRASTHA}
+      />
       <div className="text-center">
         <div className="font-chrome text-xs uppercase tracking-widest text-leaf-faint">
-          Turn {Math.min(state.turn, TURN_LIMIT)} of {TURN_LIMIT}
+          Turn {Math.min(state.turn, state.turn_limit)} of {state.turn_limit}
         </div>
         <div className="mt-1 font-body text-leaf">
           {state.winner !== null
@@ -94,13 +118,15 @@ export default function ScoreBar({
               : `${PLAYER_NAME[state.active_player]} is acting…`}
         </div>
         <div className="mt-0.5 font-chrome text-[11px] text-leaf-faint">
-          Win: four open oaths, or the legitimacy lead after turn 12
+          Win: {state.oaths_to_win} open oaths, or the legitimacy lead after
+          turn {state.turn_limit}
         </div>
       </div>
       <Claim
         state={state}
         player={MAGADHA}
         isHuman={human === MAGADHA}
+        hideShadow={veiled && human !== MAGADHA}
         alignRight
       />
     </header>

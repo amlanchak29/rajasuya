@@ -88,7 +88,13 @@ def in_session(state):
     return set(picks_out)
 
 
-def initial_state(seed=0):
+def initial_state(seed=0, turns=TURN_LIMIT, oaths=OATHS_TO_WIN):
+    """Variant support (digvijaya mode): the clock and the oath bar live in
+    state so apply() stays a pure function of (state, action). Measured
+    variants only — (16, 6) is the one long config that held the dharma
+    balance (79/78 at N=80/matchup); 5-oath bars at any length favored
+    expedient 60-73%. See variant_study.py."""
+
     def fig(quadrant, vows=(), allegiance=None):
         return {
             "quadrant": quadrant,
@@ -104,6 +110,8 @@ def initial_state(seed=0):
 
     return {
         "turn": 1,
+        "turn_limit": turns,
+        "oaths_to_win": oaths,
         "active_player": INDRAPRASTHA,
         "actions_remaining": ACTIONS_PER_TURN,
         "seed": seed,
@@ -394,7 +402,8 @@ def _credit_liberator(s, actor):
 
 
 def _check_winner(s):
-    reached = [p for p in PLAYERS if s["oaths"][p] >= OATHS_TO_WIN]
+    goal = s.get("oaths_to_win", OATHS_TO_WIN)
+    reached = [p for p in PLAYERS if s["oaths"][p] >= goal]
     if reached:
         best = max(s["oaths"][p] for p in reached)
         tied = [p for p in reached if s["oaths"][p] == best]
@@ -402,7 +411,7 @@ def _check_winner(s):
             return tied[0]
         a, b = (s["legitimacy"][p] for p in tied)
         return "draw" if a == b else (tied[0] if a > b else tied[1])
-    if s["turn"] > TURN_LIMIT:
+    if s["turn"] > s.get("turn_limit", TURN_LIMIT):
         a, b = s["legitimacy"][INDRAPRASTHA], s["legitimacy"][MAGADHA]
         return "draw" if a == b else (INDRAPRASTHA if a > b else MAGADHA)
     return None

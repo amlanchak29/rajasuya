@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { INDRAPRASTHA, MAGADHA, type Player } from "../engine/engine";
 import type { Dharma } from "../engine/agent";
-import type { Setup } from "../game/useGame";
+import { MODES, type Mode, type Setup } from "../game/useGame";
 import { PLAYER_EPITHET, PLAYER_NAME } from "../game/text";
 import { HERO, SIGILS } from "./assets";
 
@@ -17,6 +17,8 @@ export default function SetupScreen({
 }) {
   const [human, setHuman] = useState<Player>(INDRAPRASTHA);
   const [aiDharma, setAiDharma] = useState<Dharma>("expedient");
+  const [veiled, setVeiled] = useState(false);
+  const [mode, setMode] = useState<Mode>("quick");
   const [seed, setSeed] = useState(() => Math.floor(Math.random() * 100000));
 
   const pick = (selected: boolean) =>
@@ -41,9 +43,9 @@ export default function SetupScreen({
           Rajasuya
         </h1>
         <p className="mt-2 font-body italic text-leaf-dim">
-          Two claims to paramountcy. Neither sits on a throne. First to four
-          oaths sworn before the world, or the greater legitimacy at the
-          twelfth turn.
+          Two claims to paramountcy. Neither sits on a throne. Win the oaths
+          of kings before the world, or hold the greater legitimacy when the
+          clock runs out.
         </p>
       </header>
 
@@ -88,6 +90,50 @@ export default function SetupScreen({
         </div>
       </section>
 
+      <section>
+        <h2 className="font-chrome text-xs uppercase tracking-widest text-leaf-faint">
+          The game
+        </h2>
+        <div className="mt-2 grid grid-cols-2 gap-3">
+          <button className={pick(mode === "quick")} onClick={() => setMode("quick")}>
+            <div className="font-body text-lg text-leaf">Quick game</div>
+            <div className="font-chrome text-sm text-leaf-dim">
+              {MODES.quick.turns} turns, {MODES.quick.oaths} oaths. One
+              sitting.
+            </div>
+          </button>
+          <button
+            className={pick(mode === "digvijaya")}
+            onClick={() => setMode("digvijaya")}
+          >
+            <div className="font-body text-lg text-leaf">The digvijaya</div>
+            <div className="font-chrome text-sm text-leaf-dim">
+              {MODES.digvijaya.turns} turns, {MODES.digvijaya.oaths} oaths.
+              The long road to the sacrifice.
+            </div>
+          </button>
+        </div>
+      </section>
+
+      <section>
+        <h2 className="font-chrome text-xs uppercase tracking-widest text-leaf-faint">
+          The veil
+        </h2>
+        <button
+          onClick={() => setVeiled(!veiled)}
+          aria-pressed={veiled}
+          className={`${pick(veiled)} mt-2 w-full`}
+        >
+          <div className="font-body text-lg text-leaf">
+            {veiled ? "Veiled numbers — on" : "Veiled numbers — off"}
+          </div>
+          <div className="font-chrome text-sm text-leaf-dim">
+            Your rival's debts and leverage stay hidden. You know only what
+            happens in open court — their secret work surfaces as surprises.
+          </div>
+        </button>
+      </section>
+
       <section className="flex items-end gap-3">
         <label className="grow">
           <span className="font-chrome text-xs uppercase tracking-widest text-leaf-faint">
@@ -109,7 +155,7 @@ export default function SetupScreen({
       </section>
 
       <button
-        onClick={() => onBegin({ human, aiDharma, seed })}
+        onClick={() => onBegin({ human, aiDharma, seed, mode, veiled })}
         className="rounded bg-indra px-6 py-3 font-chrome text-lg font-bold text-hall hover:brightness-110"
       >
         Enter the hall

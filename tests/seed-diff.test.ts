@@ -29,6 +29,7 @@ interface Step {
 
 interface Game {
   seed: number;
+  config: { turns: number; oaths: number };
   dharmas: Record<string, Dharma>;
   winner: string;
   steps: Step[];
@@ -53,8 +54,8 @@ describe("seed-diff against engine_r9.py", () => {
   });
 
   for (const game of games) {
-    it(`seed ${game.seed} (${game.dharmas.indraprastha} vs ${game.dharmas.magadha})`, () => {
-      let state = initialState(game.seed);
+    it(`seed ${game.seed} (${game.dharmas.indraprastha} vs ${game.dharmas.magadha}, ${game.config.turns}t/${game.config.oaths}o)`, () => {
+      let state = initialState(game.seed, game.config.turns, game.config.oaths);
       for (const [i, step] of game.steps.entries()) {
         const ctx = `seed ${game.seed} step ${i}`;
         expect(sortActions(legalActions(state)), `${ctx} legal`).toEqual(
