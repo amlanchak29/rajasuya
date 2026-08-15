@@ -7,6 +7,7 @@ import {
   type State,
 } from "../engine/engine";
 import { PLAYER_NAME } from "../game/text";
+import { SIGILS } from "./assets";
 
 function OathPips({ count, color }: { count: number; color: string }) {
   return (
@@ -38,7 +39,15 @@ function Claim({
   const nameColor = gold ? "text-indra" : "text-magadha";
   const pipColor = gold ? "bg-indra" : "bg-magadha";
   return (
-    <div className={alignRight ? "text-right" : ""}>
+    <div
+      className={`flex items-center gap-3 ${alignRight ? "flex-row-reverse text-right" : ""}`}
+    >
+      <img
+        src={SIGILS[player]}
+        alt=""
+        className="h-11 w-11 rounded-full object-cover"
+      />
+      <div>
       <div className={`font-display text-xl leading-tight ${nameColor}`}>
         {PLAYER_NAME[player]}
         <span className="ml-2 font-chrome text-xs text-leaf-faint">
@@ -55,6 +64,7 @@ function Claim({
         <span className="text-shadow-blue" title="Oaths sworn in secret — held, but not advancing the sacrifice">
           in shadow {state.concealed_oaths[player]}
         </span>
+      </div>
       </div>
     </div>
   );

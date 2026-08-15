@@ -17,6 +17,7 @@ import {
   VERB_EFFECT,
   VERB_GLOSS,
 } from "../game/text";
+import { PORTRAITS } from "./assets";
 
 const VERB_CHOICES: [Verb, Visibility][] = VERBS.flatMap((verb) =>
   verb === "satkara"
@@ -143,11 +144,18 @@ export default function ActionPanel({
 
       {selected && !mustPass && (
         <div className="mt-2">
-          <div className="font-display text-xl text-leaf">
-            {FIGURE_NAME[selected]}
-            <span className="ml-2 font-chrome text-xs uppercase tracking-wide text-leaf-faint">
-              {QUADRANT_NAME[state.figures[selected].quadrant]}
-            </span>
+          <div className="flex items-center gap-3">
+            <img
+              src={PORTRAITS[selected]}
+              alt=""
+              className="h-14 w-11 rounded object-cover object-top"
+            />
+            <div className="font-display text-xl text-leaf">
+              {FIGURE_NAME[selected]}
+              <span className="ml-2 font-chrome text-xs uppercase tracking-wide text-leaf-faint">
+                {QUADRANT_NAME[state.figures[selected].quadrant]}
+              </span>
+            </div>
           </div>
 
           <PathLadder p={progressOf(state, selected, human)} />

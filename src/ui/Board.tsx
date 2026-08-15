@@ -10,6 +10,7 @@ import {
 import { sealOf } from "../game/useGame";
 import { progressOf } from "../game/progress";
 import { FIGURE_NAME, PLAYER_NAME, QUADRANT_NAME } from "../game/text";
+import { PORTRAITS } from "./assets";
 
 const dot = (p: Player) => (p === INDRAPRASTHA ? "bg-indra" : "bg-magadha");
 const tint = (p: Player) => (p === INDRAPRASTHA ? "text-indra" : "text-magadha");
@@ -44,10 +45,19 @@ function FigureCard({
           : "border-line bg-court/60 hover:border-line-bright"
       } ${inSess ? "" : "opacity-50 saturate-50"}`}
     >
-      <div className="flex items-baseline justify-between gap-2">
-        <span className="font-display text-lg leading-tight text-leaf">
-          {FIGURE_NAME[id]}
-        </span>
+      <div className="flex gap-2.5">
+        <img
+          src={PORTRAITS[id]}
+          alt=""
+          className={`h-16 w-13 shrink-0 rounded object-cover object-top ${
+            f.locked ? "opacity-80" : ""
+          }`}
+        />
+        <div className="min-w-0 grow">
+          <div className="flex items-baseline justify-between gap-2">
+            <span className="font-display text-lg leading-tight text-leaf">
+              {FIGURE_NAME[id]}
+            </span>
         {seal && (
           <span
             className={`font-chrome text-[11px] uppercase tracking-wide ${
@@ -106,6 +116,8 @@ function FigureCard({
             ready to petition
           </span>
         )}
+          </div>
+        </div>
       </div>
     </button>
   );

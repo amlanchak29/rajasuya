@@ -11,6 +11,7 @@ import { useGame, type Setup } from "./game/useGame";
 import { guideLine } from "./game/guide";
 import { PLAYER_NAME, QUADRANT_NAME } from "./game/text";
 import SetupScreen from "./ui/SetupScreen";
+import { SIGILS } from "./ui/assets";
 import ScoreBar from "./ui/ScoreBar";
 import GuideStrip from "./ui/GuideStrip";
 import Board from "./ui/Board";
@@ -107,6 +108,13 @@ function Game({ setup, onNewGame }: { setup: Setup; onNewGame: () => void }) {
       {state.winner !== null && (
         <div className="fixed inset-0 grid place-items-center bg-hall/80 p-6">
           <div className="max-w-md rounded-lg border border-line-bright bg-court p-8 text-center">
+            {state.winner !== "draw" && (
+              <img
+                src={SIGILS[state.winner]}
+                alt=""
+                className="mx-auto mb-4 h-20 w-20 rounded-full object-cover"
+              />
+            )}
             <div
               className={`font-display text-4xl ${
                 state.winner === INDRAPRASTHA

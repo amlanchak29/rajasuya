@@ -3,6 +3,7 @@ import { INDRAPRASTHA, MAGADHA, type Player } from "../engine/engine";
 import type { Dharma } from "../engine/agent";
 import type { Setup } from "../game/useGame";
 import { PLAYER_EPITHET, PLAYER_NAME } from "../game/text";
+import { HERO, SIGILS } from "./assets";
 
 const DHARMA_LINE: Record<Dharma, string> = {
   expedient: "Will swear kings in shadow and spend legitimacy to do it.",
@@ -28,6 +29,14 @@ export default function SetupScreen({
   return (
     <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-8 px-6 py-12">
       <header>
+        <div className="relative -mx-6 mb-6 overflow-hidden sm:mx-0 sm:rounded-lg">
+          <img
+            src={HERO}
+            alt="Two empty thrones face each other across a lamplit hall"
+            className="h-44 w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-hall via-transparent to-transparent" />
+        </div>
         <h1 className="font-display text-5xl tracking-wide text-leaf">
           Rajasuya
         </h1>
@@ -45,6 +54,11 @@ export default function SetupScreen({
         <div className="mt-2 grid grid-cols-2 gap-3">
           {([INDRAPRASTHA, MAGADHA] as const).map((p) => (
             <button key={p} className={pick(human === p)} onClick={() => setHuman(p)}>
+              <img
+                src={SIGILS[p]}
+                alt=""
+                className="mb-2 h-12 w-12 rounded-full object-cover"
+              />
               <div
                 className={`font-display text-xl ${p === INDRAPRASTHA ? "text-indra" : "text-magadha"}`}
               >
