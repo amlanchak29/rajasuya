@@ -9,7 +9,7 @@ export const WAY_SEEN_KEY = "rajasuya-way-seen";
 const PANELS = [
   {
     image: HERO,
-    heading: "Two claims to paramountcy",
+    heading: "Two rival claims",
     body:
       "You are Yudhishthira's claim, seated at Indraprastha — or " +
       "Jarasandha's, at Magadha. Neither of you holds the imperial " +
@@ -21,9 +21,8 @@ const PANELS = [
     heading: "Win the world, openly",
     body:
       "A king who swears to you before the assembled world advances your " +
-      "claim. Gather the oaths the sacrifice demands — or hold the " +
-      "greater legitimacy when the clock runs out — and paramountcy is " +
-      "yours.",
+      "claim. Gather the oaths you need — or hold the greater legitimacy " +
+      "when the clock runs out — and the throne is yours.",
   },
   {
     image: WAY.feast,
@@ -48,8 +47,8 @@ const PANELS = [
     body:
       "Hidden petitions come cheaper, and counsel — Mantrana — is always " +
       "silent. But secrets win nothing before the world: a king sworn in " +
-      "shadow is held, and denied to your rival, and worth nothing to " +
-      "the sacrifice.",
+      "shadow is held, and denied to your rival — and counts for nothing " +
+      "toward your victory.",
   },
 ];
 

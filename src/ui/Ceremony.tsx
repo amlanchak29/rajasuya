@@ -54,7 +54,8 @@ export default function Ceremony({
           </p>
         ) : (
           <p className="max-w-sm font-body text-lg italic text-shadow-blue">
-            swears in shadow — held and sealed, but no nearer the sacrifice
+            swears in shadow — held and sealed, but it counts for nothing
+            before the world
           </p>
         )}
         <img

@@ -58,7 +58,7 @@ export const VERB_EFFECT: Record<string, string> = {
   "yachana|hidden": "claims his allegiance, unseen",
   "mantrana|hidden": "+2 leverage, unseen",
   "pratigya|open": "seals him before the world: +1 oath, +3 legitimacy",
-  "pratigya|hidden": "seals him in shadow: held, but no nearer the sacrifice",
+  "pratigya|hidden": "seals him in shadow: held, but counts for nothing openly",
 };
 
 const LOG_VERB: Record<string, string> = {

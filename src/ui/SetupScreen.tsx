@@ -43,9 +43,9 @@ export default function SetupScreen({
           Rajasuya
         </h1>
         <p className="mt-2 font-body italic text-leaf-dim">
-          Two claims to paramountcy. Neither sits on a throne. Win the oaths
-          of kings before the world, or hold the greater legitimacy when the
-          clock runs out.
+          Two rivals claim the high kingship. Neither holds the throne. Win
+          the oaths of kings before the world, or hold the greater
+          legitimacy when the clock runs out.
         </p>
       </header>
 
@@ -135,10 +135,10 @@ export default function SetupScreen({
             className={pick(mode === "digvijaya")}
             onClick={() => setMode("digvijaya")}
           >
-            <div className="font-body text-lg text-leaf">The digvijaya</div>
+            <div className="font-body text-lg text-leaf">The long road</div>
             <div className="font-chrome text-sm text-leaf-dim">
               {MODES.digvijaya.turns} turns, {MODES.digvijaya.oaths} oaths.
-              The long road to the sacrifice.
+              A slower, deeper game.
             </div>
           </button>
         </div>

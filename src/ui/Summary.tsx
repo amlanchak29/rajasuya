@@ -25,7 +25,7 @@ function verdict(state: State): { title: string; line: string } {
   if (state.oaths[w] >= state.oaths_to_win)
     return {
       title: PLAYER_NAME[w],
-      line: `${NUMBER_WORD[state.oaths_to_win] ?? state.oaths_to_win} kings acknowledged ${PLAYER_NAME[w]} before the world. The sacrifice is theirs.`,
+      line: `${NUMBER_WORD[state.oaths_to_win] ?? state.oaths_to_win} kings acknowledged ${PLAYER_NAME[w]} before the world. The throne is theirs.`,
     };
   return {
     title: PLAYER_NAME[w],

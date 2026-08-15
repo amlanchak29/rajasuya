@@ -76,7 +76,7 @@ function Claim({
         {!hideShadow && (
           <span
             className="text-shadow-blue"
-            title="Oaths sworn in secret — held, but not advancing the sacrifice"
+            title="Oaths sworn in secret — kings held, but they count for nothing toward victory"
           >
             in shadow {state.concealed_oaths[player]}
           </span>

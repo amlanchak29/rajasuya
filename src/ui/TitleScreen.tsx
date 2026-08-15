@@ -20,8 +20,8 @@ export default function TitleScreen({
           Rajasuya
         </h1>
         <p className="max-w-md font-body text-lg italic text-leaf-dim">
-          Two claims to paramountcy. Neither sits on a throne. Twelve kings
-          will decide.
+          Two rivals claim the high kingship. Neither holds the throne.
+          Twelve kings will decide.
         </p>
         <div className="mt-4 flex flex-wrap justify-center gap-3">
           <button
