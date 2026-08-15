@@ -11,6 +11,8 @@ import ActionPanel from "./ui/ActionPanel";
 import Chronicle from "./ui/Chronicle";
 import Ceremony, { type OathCeremony } from "./ui/Ceremony";
 import Summary from "./ui/Summary";
+import TitleScreen from "./ui/TitleScreen";
+import TheWay, { WAY_SEEN_KEY } from "./ui/TheWay";
 import { PORTRAITS } from "./ui/assets";
 
 /** Announce session redraws and flare the newly lit courts — the redraw
@@ -76,6 +78,7 @@ function Game({ setup, onNewGame }: { setup: Setup; onNewGame: () => void }) {
   const { state, legal, sessions, act, isHumanTurn, ai, aiAct } =
     useGame(setup);
   const [selected, setSelected] = useState<string | null>(null);
+  const [showWay, setShowWay] = useState(false);
   const { note, justLit, litStamp } = useSessionNarration(
     sessions,
     state.winner !== null,
@@ -107,6 +110,7 @@ function Game({ setup, onNewGame }: { setup: Setup; onNewGame: () => void }) {
         human={setup.human}
         veiled={setup.veiled}
         isHumanTurn={isHumanTurn}
+        onShowWay={() => setShowWay(true)}
       />
       <GuideStrip guide={guide} sessionNote={note} />
       <div className="flex grow flex-col gap-3 p-3 lg:flex-row">
@@ -154,6 +158,8 @@ function Game({ setup, onNewGame }: { setup: Setup; onNewGame: () => void }) {
         </div>
       )}
 
+      {showWay && <TheWay onDone={() => setShowWay(false)} />}
+
       {ceremony !== null && (
         <Ceremony ceremony={ceremony} state={state} onClose={dismiss} />
       )}
@@ -166,13 +172,29 @@ function Game({ setup, onNewGame }: { setup: Setup; onNewGame: () => void }) {
 }
 
 export default function App() {
+  const [screen, setScreen] = useState<"title" | "way" | "setup">("title");
   const [setup, setSetup] = useState<Setup | null>(null);
-  if (!setup) return <SetupScreen onBegin={setSetup} />;
-  return (
-    <Game
-      key={`${setup.human}-${setup.aiDharma}-${setup.seed}-${setup.veiled}`}
-      setup={setup}
-      onNewGame={() => setSetup(null)}
-    />
-  );
+
+  if (setup !== null)
+    return (
+      <Game
+        key={`${setup.human}-${setup.aiDharma}-${setup.seed}-${setup.mode}-${setup.veiled}`}
+        setup={setup}
+        onNewGame={() => {
+          setSetup(null);
+          setScreen("setup");
+        }}
+      />
+    );
+  if (screen === "title")
+    return (
+      <TitleScreen
+        onEnter={() =>
+          setScreen(localStorage.getItem(WAY_SEEN_KEY) ? "setup" : "way")
+        }
+        onLearn={() => setScreen("way")}
+      />
+    );
+  if (screen === "way") return <TheWay onDone={() => setScreen("setup")} />;
+  return <SetupScreen onBegin={setSetup} />;
 }

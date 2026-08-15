@@ -27,7 +27,21 @@
 }
 
 html {
-  background: var(--color-hall);
+  /* The hall at night: faint lamplight from above, darkness pooling at
+     the edges — atmosphere without an image. */
+  background:
+    radial-gradient(
+      120% 80% at 50% -10%,
+      rgba(217, 164, 65, 0.05),
+      transparent 55%
+    ),
+    radial-gradient(
+      140% 120% at 50% 130%,
+      rgba(0, 0, 0, 0.55),
+      transparent 55%
+    ),
+    var(--color-hall);
+  min-height: 100%;
   color: var(--color-leaf);
   font-family: var(--font-body);
 }

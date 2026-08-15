@@ -24,7 +24,7 @@ import {
   VERB_EFFECT,
   VERB_GLOSS,
 } from "../game/text";
-import { PORTRAITS } from "./assets";
+import { PORTRAITS, VERB_ICONS } from "./assets";
 
 const VERB_CHOICES: [Verb, Visibility][] = VERBS.flatMap((verb) =>
   verb === "satkara"
@@ -196,17 +196,24 @@ export default function ActionPanel({
                           : "cursor-not-allowed border-line opacity-70"
                     }`}
                   >
-                    <span className="font-display text-base text-leaf">
-                      {verb[0].toUpperCase() + verb.slice(1)}
-                    </span>
-                    <span className="ml-2 font-chrome text-xs text-leaf-dim">
-                      {VERB_GLOSS[verb]} ·{" "}
-                      <span
-                        className={
-                          vis === HIDDEN ? "text-shadow-blue" : "text-indra"
-                        }
-                      >
-                        {vis}
+                    <span className="flex items-center gap-2">
+                      <img
+                        src={VERB_ICONS[verb]}
+                        alt=""
+                        className={`h-6 w-6 rounded-sm object-cover ${isLegal ? "" : "opacity-60"}`}
+                      />
+                      <span className="font-display text-base text-leaf">
+                        {verb[0].toUpperCase() + verb.slice(1)}
+                      </span>
+                      <span className="font-chrome text-xs text-leaf-dim">
+                        {VERB_GLOSS[verb]} ·{" "}
+                        <span
+                          className={
+                            vis === HIDDEN ? "text-shadow-blue" : "text-indra"
+                          }
+                        >
+                          {vis}
+                        </span>
                       </span>
                     </span>
                     <div

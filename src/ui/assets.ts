@@ -15,7 +15,15 @@ import kritavarma from "../assets/figures/kritavarma.jpg";
 import sigilIndraprastha from "../assets/sigil-indraprastha.jpg";
 import sigilMagadha from "../assets/sigil-magadha.jpg";
 import hero from "../assets/hero.jpg";
-import type { Player } from "../engine/engine";
+import wayOath from "../assets/way/oath.jpg";
+import wayFeast from "../assets/way/feast.jpg";
+import wayCounsel from "../assets/way/counsel.jpg";
+import wayRefusal from "../assets/way/refusal.jpg";
+import verbSatkara from "../assets/verbs/satkara.jpg";
+import verbYachana from "../assets/verbs/yachana.jpg";
+import verbMantrana from "../assets/verbs/mantrana.jpg";
+import verbPratigya from "../assets/verbs/pratigya.jpg";
+import type { Player, Verb } from "../engine/engine";
 
 export const PORTRAITS: Record<string, string> = {
   bhagadatta,
@@ -38,3 +46,17 @@ export const SIGILS: Record<Player, string> = {
 };
 
 export const HERO = hero;
+
+export const WAY = {
+  oath: wayOath,
+  feast: wayFeast,
+  counsel: wayCounsel,
+  refusal: wayRefusal,
+};
+
+export const VERB_ICONS: Record<Verb, string> = {
+  satkara: verbSatkara,
+  yachana: verbYachana,
+  mantrana: verbMantrana,
+  pratigya: verbPratigya,
+};

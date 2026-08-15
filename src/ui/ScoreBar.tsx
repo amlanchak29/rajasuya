@@ -92,11 +92,13 @@ export default function ScoreBar({
   human,
   veiled,
   isHumanTurn,
+  onShowWay,
 }: {
   state: State;
   human: Player;
   veiled: boolean;
   isHumanTurn: boolean;
+  onShowWay: () => void;
 }) {
   return (
     <header className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 border-b border-line px-4 py-3">
@@ -120,6 +122,13 @@ export default function ScoreBar({
         <div className="mt-0.5 font-chrome text-[11px] text-leaf-faint">
           Win: {state.oaths_to_win} open oaths, or the legitimacy lead after
           turn {state.turn_limit}
+          {" · "}
+          <button
+            onClick={onShowWay}
+            className="underline decoration-line-bright underline-offset-2 hover:text-leaf-dim"
+          >
+            the way
+          </button>
         </div>
       </div>
       <Claim

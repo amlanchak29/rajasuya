@@ -49,6 +49,35 @@ export default function SetupScreen({
         </p>
       </header>
 
+      <section className="rounded-lg border border-line-bright bg-court p-4">
+        <button
+          onClick={() =>
+            onBegin({
+              human: INDRAPRASTHA,
+              aiDharma: "expedient",
+              seed: Math.floor(Math.random() * 100000),
+              mode: "quick",
+              veiled: false,
+            })
+          }
+          className="w-full rounded bg-indra px-6 py-3 font-chrome text-lg font-bold text-hall hover:brightness-110"
+        >
+          Begin your first game
+        </button>
+        <p className="mt-2 text-center font-chrome text-sm text-leaf-dim">
+          Indraprastha, against an expedient rival. The counsel strip will
+          walk you to your first oath.
+        </p>
+      </section>
+
+      <div className="flex items-center gap-3">
+        <span className="h-px grow bg-line" />
+        <span className="font-chrome text-xs uppercase tracking-widest text-leaf-faint">
+          or shape your own game
+        </span>
+        <span className="h-px grow bg-line" />
+      </div>
+
       <section>
         <h2 className="font-chrome text-xs uppercase tracking-widest text-leaf-faint">
           Your claim
