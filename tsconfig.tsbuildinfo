@@ -1,1 +1,1 @@
-{"root":["./src/app.tsx","./src/main.tsx","./src/engine/agent.ts","./src/engine/engine.ts","./tests/seed-diff.test.ts"],"version":"5.9.3"}
+{"root":["./src/app.tsx","./src/main.tsx","./src/engine/agent.ts","./src/engine/engine.ts","./src/game/text.ts","./src/game/usegame.ts","./src/ui/actionpanel.tsx","./src/ui/board.tsx","./src/ui/chronicle.tsx","./src/ui/scorebar.tsx","./src/ui/setupscreen.tsx","./tests/seed-diff.test.ts"],"version":"5.9.3"}

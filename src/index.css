@@ -1,1 +1,50 @@
+@import "@fontsource/rozha-one/400.css";
+@import "@fontsource/alegreya/400.css";
+@import "@fontsource/alegreya/400-italic.css";
+@import "@fontsource/alegreya/700.css";
+@import "@fontsource/alegreya-sans/400.css";
+@import "@fontsource/alegreya-sans/500.css";
+@import "@fontsource/alegreya-sans/700.css";
 @import "tailwindcss";
+
+@theme {
+  /* The hall at night. Light means a court in session. */
+  --color-hall: #171210;
+  --color-court: #241c17;
+  --color-court-closed: #1b1613;
+  --color-line: #3a2e24;
+  --color-line-bright: #55432f;
+  --color-leaf: #e7d7b1;
+  --color-leaf-dim: #9c8a6c;
+  --color-leaf-faint: #6b5d46;
+  --color-indra: #d9a441;
+  --color-magadha: #b8483c;
+  --color-shadow-blue: #8891c0;
+
+  --font-display: "Rozha One", "Georgia", serif;
+  --font-body: "Alegreya", "Georgia", serif;
+  --font-chrome: "Alegreya Sans", "Helvetica Neue", sans-serif;
+}
+
+html {
+  background: var(--color-hall);
+  color: var(--color-leaf);
+  font-family: var(--font-body);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-indra);
+  outline-offset: 2px;
+}
+
+/* Lamplight pool over a court in session. */
+.lamplit {
+  background:
+    radial-gradient(
+      120% 90% at 50% -20%,
+      rgba(217, 164, 65, 0.14),
+      rgba(217, 164, 65, 0.03) 55%,
+      transparent 75%
+    ),
+    var(--color-court);
+}
