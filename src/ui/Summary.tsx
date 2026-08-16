@@ -66,7 +66,7 @@ export default function Summary({
 }) {
   const v = verdict(state);
   return (
-    <div className="fixed inset-0 z-10 overflow-y-auto bg-hall/95 p-6">
+    <div className="fixed inset-0 z-40 overflow-y-auto bg-hall/95 p-4 sm:p-6">
       <div className="mx-auto max-w-3xl rounded-lg border border-line-bright bg-court p-8">
         <div className="text-center">
           {state.winner !== "draw" && state.winner !== null && (

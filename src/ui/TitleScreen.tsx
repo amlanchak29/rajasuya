@@ -17,7 +17,7 @@ export default function TitleScreen({
       <div className="lamp-flicker absolute inset-0 bg-[radial-gradient(80%_60%_at_50%_45%,rgba(217,164,65,0.10),transparent_70%)]" />
       <div className="absolute inset-0 bg-gradient-to-t from-hall via-hall/50 to-hall/20" />
       <div className="relative flex flex-col items-center gap-4 px-6 pb-20 text-center">
-        <h1 className="font-display text-7xl tracking-wide text-leaf drop-shadow-lg">
+        <h1 className="font-display text-5xl tracking-wide text-leaf drop-shadow-lg sm:text-7xl">
           Rajasuya
         </h1>
         <p className="max-w-md font-body text-lg italic text-leaf-dim">

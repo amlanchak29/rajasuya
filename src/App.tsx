@@ -123,6 +123,33 @@ function Game({ setup, onNewGame }: { setup: Setup; onNewGame: () => void }) {
       ? guideLine(state, setup.human, setup.veiled)
       : null;
 
+  const handleAct = (a: Action) => {
+    const s = sfxFor(a);
+    if (s) playSfx(s);
+    if (a.target !== null) {
+      const target = a.target;
+      setFlash((f) => ({ id: target, stamp: (f?.stamp ?? 0) + 1 }));
+    }
+    act(a);
+  };
+
+  // On small screens the action panel rides in a bottom sheet — selecting
+  // a king shouldn't mean scrolling to the foot of the page to act on him.
+  const mustPass =
+    isHumanTurn && legal.length === 1 && legal[0].verb === "pass";
+  const sheetOpen = selected !== null || mustPass;
+  const panel = (
+    <ActionPanel
+      state={state}
+      legal={legal}
+      human={setup.human}
+      veiled={setup.veiled}
+      isHumanTurn={isHumanTurn}
+      selected={selected}
+      onAct={handleAct}
+    />
+  );
+
   const aiOpen = aiAct !== null && aiAct.action.visibility === "open";
   const aiToastText =
     aiAct === null
@@ -160,29 +187,23 @@ function Game({ setup, onNewGame }: { setup: Setup; onNewGame: () => void }) {
           onSelect={(id) => setSelected(id === selected ? null : id)}
         />
         <aside className="flex flex-col gap-3 lg:w-80 lg:shrink-0">
-          <ActionPanel
-            state={state}
-            legal={legal}
-            human={setup.human}
-            veiled={setup.veiled}
-            isHumanTurn={isHumanTurn}
-            selected={selected}
-            onAct={(a) => {
-              const s = sfxFor(a);
-              if (s) playSfx(s);
-              if (a.target !== null) {
-                const target = a.target;
-                setFlash((f) => ({
-                  id: target,
-                  stamp: (f?.stamp ?? 0) + 1,
-                }));
-              }
-              act(a);
-            }}
-          />
+          <div className="hidden lg:block">{panel}</div>
           <Chronicle state={state} />
         </aside>
       </div>
+
+      {sheetOpen && (
+        <div className="lg:hidden">
+          <button
+            aria-label="Close"
+            onClick={() => setSelected(null)}
+            className="fixed inset-0 z-20 cursor-default bg-hall/60"
+          />
+          <div className="fixed inset-x-0 bottom-0 z-30 max-h-[70vh] overflow-y-auto rounded-t-xl border-x border-t border-line-bright bg-court-closed shadow-2xl">
+            {panel}
+          </div>
+        </div>
+      )}
 
       {aiToastText !== null && state.winner === null && (
         <div

@@ -53,17 +53,17 @@ function Claim({
       <img
         src={SIGILS[player]}
         alt=""
-        className="h-11 w-11 rounded-full object-cover"
+        className="h-8 w-8 rounded-full object-cover md:h-11 md:w-11"
       />
       <div>
-      <div className={`font-display text-xl leading-tight ${nameColor}`}>
+      <div className={`font-display text-lg leading-tight md:text-xl ${nameColor}`}>
         {PLAYER_NAME[player]}
         <span className="ml-2 font-chrome text-xs text-leaf-faint">
           {isHuman ? "you" : "rival"}
         </span>
       </div>
       <div
-        className={`mt-1 flex items-center gap-4 font-chrome text-sm text-leaf-dim ${alignRight ? "justify-end" : ""}`}
+        className={`mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 font-chrome text-xs text-leaf-dim md:gap-4 md:text-sm ${alignRight ? "justify-end" : ""}`}
       >
         <OathPips
           count={state.oaths[player]}
@@ -101,14 +101,14 @@ export default function ScoreBar({
   onShowWay: () => void;
 }) {
   return (
-    <header className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 border-b border-line px-4 py-3">
+    <header className="grid grid-cols-2 items-center gap-x-4 gap-y-1.5 border-b border-line px-4 py-3 md:grid-cols-[1fr_auto_1fr]">
       <Claim
         state={state}
         player={INDRAPRASTHA}
         isHuman={human === INDRAPRASTHA}
         hideShadow={veiled && human !== INDRAPRASTHA}
       />
-      <div className="text-center">
+      <div className="order-last col-span-2 text-center md:order-none md:col-span-1">
         <div className="font-chrome text-xs uppercase tracking-widest text-leaf-faint">
           Turn {Math.min(state.turn, state.turn_limit)} of {state.turn_limit}
         </div>

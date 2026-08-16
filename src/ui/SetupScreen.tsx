@@ -36,7 +36,7 @@ export default function SetupScreen({
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center gap-5 px-6 py-8">
-      <header className="flex items-baseline gap-4">
+      <header className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-4">
         <h1 className="font-display text-4xl tracking-wide text-leaf">
           Rajasuya
         </h1>
@@ -156,7 +156,7 @@ export default function SetupScreen({
         </section>
       </div>
 
-      <section className="flex items-end gap-3">
+      <section className="flex flex-wrap items-end gap-3">
         <label className="w-44">
           <span className="font-chrome text-xs uppercase tracking-widest text-leaf-faint">
             Seed

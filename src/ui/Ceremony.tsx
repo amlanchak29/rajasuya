@@ -31,7 +31,7 @@ export default function Ceremony({
   return (
     <button
       onClick={onClose}
-      className="ceremony-fade fixed inset-0 z-20 grid w-full cursor-pointer place-items-center bg-hall/90"
+      className="ceremony-fade fixed inset-0 z-40 grid w-full cursor-pointer place-items-center bg-hall/90"
       aria-label="Dismiss"
     >
       {/* Embers drift up through the frame; a slow glow breathes behind

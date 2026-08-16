@@ -63,7 +63,7 @@ export default function TheWay({ onDone }: { onDone: () => void }) {
   };
 
   return (
-    <main className="fixed inset-0 z-30 flex flex-col bg-hall">
+    <main className="fixed inset-0 z-50 flex flex-col bg-hall">
       <div className="relative min-h-0 grow">
         <img
           key={i}

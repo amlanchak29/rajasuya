@@ -301,7 +301,7 @@ export default function Board({
   );
   return (
     <div
-      className="grid grow grid-cols-2 gap-3 motion-safe:xl:transition-[grid-template-columns] motion-safe:xl:duration-700 xl:[grid-template-columns:var(--cols)]"
+      className="grid grow grid-cols-1 gap-3 sm:grid-cols-2 motion-safe:xl:transition-[grid-template-columns] motion-safe:xl:duration-700 xl:[grid-template-columns:var(--cols)]"
       style={{ ["--cols" as string]: cols }}
     >
       {QUADRANTS.map((q) => {
@@ -314,8 +314,8 @@ export default function Board({
             key={justLit.has(q) ? `${q}-${litStamp}` : q}
             className={`flex min-w-0 flex-col gap-2 rounded-lg border p-3 motion-safe:transition-all motion-safe:duration-700 ${
               inSess
-                ? `lamplit border-line-bright ${justLit.has(q) ? "motion-safe:court-wake" : ""}`
-                : "border-line bg-court-closed"
+                ? `lamplit border-line-bright max-xl:order-first ${justLit.has(q) ? "motion-safe:court-wake" : ""}`
+                : "border-line bg-court-closed max-xl:order-last"
             }`}
           >
             <header className="flex flex-wrap items-baseline justify-between gap-x-2">
