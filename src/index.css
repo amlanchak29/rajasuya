@@ -112,6 +112,125 @@ html {
   }
 }
 
+/* One-shot gold flash when an act lands on a card. */
+@utility card-flash {
+  animation: card-flash 0.7s ease-out 1;
+}
+
+@keyframes card-flash {
+  0% {
+    box-shadow:
+      0 0 0 1px var(--color-indra),
+      0 0 18px rgba(217, 164, 65, 0.35);
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+/* Chronicle entries arrive like ink drying. */
+@utility chron-in {
+  animation: chron-in 0.45s ease-out 1;
+}
+
+@keyframes chron-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Ceremony: a slow breathing glow, and embers rising off the lamplight. */
+@utility ceremony-glow {
+  animation: ceremony-glow 3.2s ease-in-out infinite;
+}
+
+@keyframes ceremony-glow {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.12);
+  }
+}
+
+@utility ember {
+  animation: ember-rise 2.8s linear infinite;
+}
+
+@keyframes ember-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(1);
+  }
+  12% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-46vh) translateX(var(--ember-drift, 0px))
+      scale(0.4);
+  }
+}
+
+/* Title screen: the hall breathes, the lamps waver. */
+@utility kenburns {
+  animation: kenburns 45s ease-in-out infinite alternate;
+}
+
+@keyframes kenburns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.07) translateY(-1.5%);
+  }
+}
+
+@utility lamp-flicker {
+  animation: lamp-flicker 7s ease-in-out infinite;
+}
+
+@keyframes lamp-flicker {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  18% {
+    opacity: 0.5;
+  }
+  27% {
+    opacity: 0.32;
+  }
+  44% {
+    opacity: 0.55;
+  }
+  61% {
+    opacity: 0.38;
+  }
+  83% {
+    opacity: 0.52;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-flash,
+  .chron-in,
+  .ceremony-glow,
+  .ember,
+  .kenburns,
+  .lamp-flicker {
+    animation: none;
+  }
+}
+
 /* Lamplight pool over a court in session. */
 .lamplit {
   background:

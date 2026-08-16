@@ -17,7 +17,10 @@ export default function Chronicle({ state }: { state: State }) {
           </li>
         )}
         {entries.map((e, i) => (
-          <li key={entries.length - i} className="font-body text-sm leading-snug">
+          <li
+            key={entries.length - i}
+            className="chron-in font-body text-sm leading-snug"
+          >
             <span className="font-chrome text-xs text-leaf-faint">
               T{e.turn}
             </span>{" "}

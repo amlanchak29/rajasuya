@@ -34,7 +34,29 @@ export default function Ceremony({
       className="ceremony-fade fixed inset-0 z-20 grid w-full cursor-pointer place-items-center bg-hall/90"
       aria-label="Dismiss"
     >
-      <div className="flex flex-col items-center gap-4 text-center">
+      {/* Embers drift up through the frame; a slow glow breathes behind
+          the portrait. Deterministic per-index offsets, CSS only. */}
+      {ceremony.open && (
+        <span className="pointer-events-none absolute inset-0 overflow-hidden">
+          {Array.from({ length: 14 }, (_, i) => (
+            <span
+              key={i}
+              className="ember absolute bottom-1/4 h-1 w-1 rounded-full bg-indra"
+              style={{
+                left: `${18 + ((i * 37) % 64)}%`,
+                animationDelay: `${(i * 0.37) % 2.8}s`,
+                ["--ember-drift" as string]: `${((i % 5) - 2) * 22}px`,
+              }}
+            />
+          ))}
+        </span>
+      )}
+      <div className="relative flex flex-col items-center gap-4 text-center">
+        <span
+          className={`ceremony-glow pointer-events-none absolute -inset-16 -z-10 rounded-full ${
+            ceremony.open ? "bg-indra/15" : "bg-shadow-blue/10"
+          } blur-3xl`}
+        />
         <img
           src={PORTRAITS[ceremony.figure]}
           alt=""

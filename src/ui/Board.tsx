@@ -217,6 +217,7 @@ export default function Board({
   veiled,
   justLit,
   litStamp,
+  flash,
   selected,
   onSelect,
 }: {
@@ -228,6 +229,8 @@ export default function Board({
   justLit: Set<Quadrant>;
   /** Changes on every session redraw so the pulse retriggers via remount. */
   litStamp: number;
+  /** The card an act just landed on — gets a one-shot gold flash. */
+  flash: { id: string; stamp: number } | null;
   selected: string | null;
   onSelect: (id: string) => void;
 }) {
@@ -264,16 +267,28 @@ export default function Board({
               </span>
             </header>
             {ids.map((id) => (
-              <FigureCard
-                key={id}
-                id={id}
-                state={state}
-                human={human}
-                veiled={veiled}
-                inSess={inSess}
-                selected={selected === id}
-                onSelect={onSelect}
-              />
+              <div
+                key={
+                  flash !== null && flash.id === id
+                    ? `${id}-hit${flash.stamp}`
+                    : id
+                }
+                className={
+                  flash !== null && flash.id === id
+                    ? "motion-safe:card-flash rounded"
+                    : ""
+                }
+              >
+                <FigureCard
+                  id={id}
+                  state={state}
+                  human={human}
+                  veiled={veiled}
+                  inSess={inSess}
+                  selected={selected === id}
+                  onSelect={onSelect}
+                />
+              </div>
             ))}
           </section>
         );

@@ -14,6 +14,8 @@ import Summary from "./ui/Summary";
 import TitleScreen from "./ui/TitleScreen";
 import TheWay, { WAY_SEEN_KEY } from "./ui/TheWay";
 import { PORTRAITS } from "./ui/assets";
+import { initSound, playSfx } from "./game/sound";
+import type { Action } from "./engine/engine";
 
 /** Announce session redraws and flare the newly lit courts — the redraw
  * happens after every act (in_session hashes actions_remaining), so it
@@ -38,6 +40,7 @@ function useSessionNarration(sessions: Set<Quadrant>, gameOver: boolean) {
       QUADRANT_NAME[q].replace("The", "the"),
     );
     setNote(`The courts rise — ${sitting.join(" and ")} now sit.`);
+    playSfx("courts");
     const t = setTimeout(() => setNote(null), 4500);
     return () => clearTimeout(t);
   }, [sessions, gameOver]);
@@ -74,16 +77,46 @@ function useOathCeremony(state: State, human: Player) {
   return { ceremony, dismiss: () => setCeremony(null) };
 }
 
+/** What an act sounds like. Oaths stay silent here — their ceremony
+ * carries the gong or the seal. */
+function sfxFor(a: Action): "tap" | "chime" | "thud" | null {
+  if (a.verb === "pratigya") return null;
+  if (a.verb === "pass") return "tap";
+  return a.visibility === "open" ? "chime" : "thud";
+}
+
 function Game({ setup, onNewGame }: { setup: Setup; onNewGame: () => void }) {
   const { state, legal, sessions, act, isHumanTurn, ai, aiAct } =
     useGame(setup);
   const [selected, setSelected] = useState<string | null>(null);
   const [showWay, setShowWay] = useState(false);
+  const [flash, setFlash] = useState<{ id: string; stamp: number } | null>(
+    null,
+  );
+
+  // The rival's acts get quieter voices: a tap in the open, a low thud
+  // unseen. Its target card flashes when the act was public.
+  useEffect(() => {
+    if (aiAct === null) return;
+    playSfx(aiAct.action.visibility === "open" ? "tap" : "thud");
+    if (aiAct.action.visibility === "open" && aiAct.action.target !== null) {
+      const target = aiAct.action.target;
+      setFlash((f) => ({ id: target, stamp: (f?.stamp ?? 0) + 1 }));
+    }
+  }, [aiAct]);
   const { note, justLit, litStamp } = useSessionNarration(
     sessions,
     state.winner !== null,
   );
   const { ceremony, dismiss } = useOathCeremony(state, setup.human);
+
+  useEffect(() => {
+    if (ceremony !== null) playSfx(ceremony.open ? "gong" : "seal");
+  }, [ceremony]);
+
+  useEffect(() => {
+    if (state.winner !== null) playSfx("victory");
+  }, [state.winner]);
   const guide =
     state.winner === null && isHumanTurn
       ? guideLine(state, setup.human, setup.veiled)
@@ -121,6 +154,7 @@ function Game({ setup, onNewGame }: { setup: Setup; onNewGame: () => void }) {
           veiled={setup.veiled}
           justLit={justLit}
           litStamp={litStamp}
+          flash={flash}
           selected={selected}
           onSelect={(id) => setSelected(id === selected ? null : id)}
         />
@@ -132,7 +166,18 @@ function Game({ setup, onNewGame }: { setup: Setup; onNewGame: () => void }) {
             veiled={setup.veiled}
             isHumanTurn={isHumanTurn}
             selected={selected}
-            onAct={act}
+            onAct={(a) => {
+              const s = sfxFor(a);
+              if (s) playSfx(s);
+              if (a.target !== null) {
+                const target = a.target;
+                setFlash((f) => ({
+                  id: target,
+                  stamp: (f?.stamp ?? 0) + 1,
+                }));
+              }
+              act(a);
+            }}
           />
           <Chronicle state={state} />
         </aside>
@@ -189,10 +234,14 @@ export default function App() {
   if (screen === "title")
     return (
       <TitleScreen
-        onEnter={() =>
-          setScreen(localStorage.getItem(WAY_SEEN_KEY) ? "setup" : "way")
-        }
-        onLearn={() => setScreen("way")}
+        onEnter={() => {
+          initSound();
+          setScreen(localStorage.getItem(WAY_SEEN_KEY) ? "setup" : "way");
+        }}
+        onLearn={() => {
+          initSound();
+          setScreen("way");
+        }}
       />
     );
   if (screen === "way") return <TheWay onDone={() => setScreen("setup")} />;

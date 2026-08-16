@@ -12,8 +12,9 @@ export default function TitleScreen({
       <img
         src={HERO}
         alt=""
-        className="absolute inset-0 h-full w-full object-cover"
+        className="kenburns absolute inset-0 h-full w-full object-cover"
       />
+      <div className="lamp-flicker absolute inset-0 bg-[radial-gradient(80%_60%_at_50%_45%,rgba(217,164,65,0.10),transparent_70%)]" />
       <div className="absolute inset-0 bg-gradient-to-t from-hall via-hall/50 to-hall/20" />
       <div className="relative flex flex-col items-center gap-4 px-6 pb-20 text-center">
         <h1 className="font-display text-7xl tracking-wide text-leaf drop-shadow-lg">

@@ -4,8 +4,26 @@ import {
   type Player,
   type State,
 } from "../engine/engine";
+import { useState } from "react";
 import { PLAYER_NAME } from "../game/text";
+import { initSound, isMuted, setMuted } from "../game/sound";
 import { SIGILS } from "./assets";
+
+function SoundToggle() {
+  const [muted, setMutedState] = useState(isMuted);
+  return (
+    <button
+      onClick={() => {
+        initSound();
+        setMuted(!muted);
+        setMutedState(!muted);
+      }}
+      className="underline decoration-line-bright underline-offset-2 hover:text-leaf-dim"
+    >
+      sound {muted ? "off" : "on"}
+    </button>
+  );
+}
 
 function OathPips({
   count,
@@ -129,6 +147,8 @@ export default function ScoreBar({
           >
             the way
           </button>
+          {" · "}
+          <SoundToggle />
         </div>
       </div>
       <Claim
