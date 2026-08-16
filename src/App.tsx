@@ -18,10 +18,16 @@ import { PORTRAITS } from "./ui/assets";
 import { initSound, playSfx } from "./game/sound";
 import type { Action } from "./engine/engine";
 
-/** Announce session redraws and flare the newly lit courts — the redraw
- * happens after every act (in_session hashes actions_remaining), so it
- * must be narrated or it reads as arbitrary. */
-function useSessionNarration(sessions: Set<Quadrant>, gameOver: boolean) {
+/** Announce the sitting courts after every act — the redraw happens per
+ * act (in_session hashes actions_remaining), so it must be narrated or
+ * it reads as arbitrary. When the courts DON'T change and it's the
+ * human's move, say so too: "still sit" makes it explicit that the next
+ * act can land in the same court. */
+function useSessionNarration(
+  sessions: Set<Quadrant>,
+  gameOver: boolean,
+  humanToMove: boolean,
+) {
   const [note, setNote] = useState<string | null>(null);
   const [justLit, setJustLit] = useState<Set<Quadrant>>(new Set());
   const [litStamp, setLitStamp] = useState(0);
@@ -34,17 +40,21 @@ function useSessionNarration(sessions: Set<Quadrant>, gameOver: boolean) {
     const same =
       before.size === sessions.size &&
       [...sessions].every((q) => before.has(q));
-    if (same) return;
-    setJustLit(new Set([...sessions].filter((q) => !before.has(q))));
-    setLitStamp((s) => s + 1);
     const sitting = QUADRANTS.filter((q) => sessions.has(q)).map((q) =>
       QUADRANT_NAME[q].replace("The", "the"),
     );
-    setNote(`The courts rise — ${sitting.join(" and ")} now sit.`);
-    playSfx("courts");
+    if (same) {
+      if (!humanToMove) return;
+      setNote(`${sitting.join(" and ")} still sit — you may act there again.`);
+    } else {
+      setJustLit(new Set([...sessions].filter((q) => !before.has(q))));
+      setLitStamp((s) => s + 1);
+      setNote(`The courts rise — ${sitting.join(" and ")} now sit.`);
+      playSfx("courts");
+    }
     const t = setTimeout(() => setNote(null), 4500);
     return () => clearTimeout(t);
-  }, [sessions, gameOver]);
+  }, [sessions, gameOver, humanToMove]);
 
   return { note, justLit, litStamp };
 }
@@ -108,6 +118,7 @@ function Game({ setup, onNewGame }: { setup: Setup; onNewGame: () => void }) {
   const { note, justLit, litStamp } = useSessionNarration(
     sessions,
     state.winner !== null,
+    isHumanTurn,
   );
   const { ceremony, dismiss } = useOathCeremony(state, setup.human);
 
@@ -131,6 +142,9 @@ function Game({ setup, onNewGame }: { setup: Setup; onNewGame: () => void }) {
       setFlash((f) => ({ id: target, stamp: (f?.stamp ?? 0) + 1 }));
     }
     act(a);
+    // The mobile sheet closes after each act (re-tap a king to continue);
+    // the desktop rail keeps the selection.
+    if (!window.matchMedia("(min-width: 64rem)").matches) setSelected(null);
   };
 
   // On small screens the action panel rides in a bottom sheet — selecting
