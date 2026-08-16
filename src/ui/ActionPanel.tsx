@@ -188,7 +188,7 @@ export default function ActionPanel({
                   <button
                     disabled={!isLegal}
                     onClick={() => onAct(action)}
-                    className={`w-full rounded border px-3 py-1.5 text-left ${
+                    className={`w-full rounded border px-3 py-2 text-left ${
                       isLegal
                         ? "border-line-bright bg-court hover:border-indra"
                         : blocked?.kind === "vow"
@@ -200,7 +200,7 @@ export default function ActionPanel({
                       <img
                         src={VERB_ICONS[verb]}
                         alt=""
-                        className={`h-6 w-6 rounded-sm object-cover ${isLegal ? "" : "opacity-60"}`}
+                        className={`h-8 w-8 rounded object-cover ${isLegal ? "" : "opacity-50"}`}
                       />
                       <span className="font-display text-base text-leaf">
                         {verb[0].toUpperCase() + verb.slice(1)}

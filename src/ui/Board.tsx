@@ -71,6 +71,64 @@ function StatBar({
   );
 }
 
+/** Slim card for a court that does not sit — at wide widths closed courts
+ * collapse to strips, so their kings shrink to portrait + name + status.
+ * The vow survives as a tooltip. */
+function MiniCard({
+  id,
+  state,
+  selected,
+  onSelect,
+}: {
+  id: string;
+  state: State;
+  selected: boolean;
+  onSelect: (id: string) => void;
+}) {
+  const f = state.figures[id];
+  const seal = sealOf(state, id);
+  return (
+    <button
+      onClick={() => onSelect(id)}
+      aria-pressed={selected}
+      title={
+        f.vows.length > 0
+          ? f.vows.map((v) => `${FIGURE_NAME[id]} ${VOW_TEXT[v.id]}.`).join(" ")
+          : FIGURE_NAME[id]
+      }
+      className={`flex w-full items-center gap-2 rounded border p-1.5 text-left opacity-60 saturate-50 transition-colors ${
+        selected ? "border-indra" : "border-line hover:border-line-bright"
+      }`}
+    >
+      <img
+        src={PORTRAITS[id]}
+        alt=""
+        className="h-9 w-7 shrink-0 rounded object-cover object-top"
+      />
+      <span className="min-w-0">
+        <span className="block truncate font-display text-sm leading-tight text-leaf">
+          {FIGURE_NAME[id]}
+        </span>
+        {seal !== null ? (
+          <span
+            className={`font-chrome text-[10px] uppercase tracking-wide ${
+              seal.open ? tint(seal.holder) : "text-shadow-blue"
+            }`}
+          >
+            {seal.open ? "sworn" : "sealed"}
+          </span>
+        ) : f.allegiance !== null ? (
+          <span
+            className={`font-chrome text-[10px] uppercase tracking-wide ${tint(f.allegiance)}`}
+          >
+            allied
+          </span>
+        ) : null}
+      </span>
+    </button>
+  );
+}
+
 function FigureCard({
   id,
   state,
@@ -234,8 +292,18 @@ export default function Board({
   selected: string | null;
   onSelect: (id: string) => void;
 }) {
+  // Sitting courts take center stage (4fr); closed courts collapse to
+  // strips (1fr). Both are fr units so the browser animates the change —
+  // the session redraw becomes the board's visible pulse. Below xl the
+  // board stays a plain two-column grid with full cards.
+  const cols = QUADRANTS.map((q) => (sessions.has(q) ? "3fr" : "1.2fr")).join(
+    " ",
+  );
   return (
-    <div className="grid grow grid-cols-2 gap-3 xl:grid-cols-4">
+    <div
+      className="grid grow grid-cols-2 gap-3 motion-safe:xl:transition-[grid-template-columns] motion-safe:xl:duration-700 xl:[grid-template-columns:var(--cols)]"
+      style={{ ["--cols" as string]: cols }}
+    >
       {QUADRANTS.map((q) => {
         const inSess = sessions.has(q);
         const ids = Object.keys(state.figures).filter(
@@ -244,13 +312,13 @@ export default function Board({
         return (
           <section
             key={justLit.has(q) ? `${q}-${litStamp}` : q}
-            className={`flex flex-col gap-2 rounded-lg border p-3 motion-safe:transition-all motion-safe:duration-700 ${
+            className={`flex min-w-0 flex-col gap-2 rounded-lg border p-3 motion-safe:transition-all motion-safe:duration-700 ${
               inSess
                 ? `lamplit border-line-bright ${justLit.has(q) ? "motion-safe:court-wake" : ""}`
                 : "border-line bg-court-closed"
             }`}
           >
-            <header className="flex items-baseline justify-between">
+            <header className="flex flex-wrap items-baseline justify-between gap-x-2">
               <h2
                 className={`font-chrome text-xs uppercase tracking-widest ${
                   inSess ? "text-indra" : "text-leaf-faint"
@@ -279,15 +347,27 @@ export default function Board({
                     : ""
                 }
               >
-                <FigureCard
-                  id={id}
-                  state={state}
-                  human={human}
-                  veiled={veiled}
-                  inSess={inSess}
-                  selected={selected === id}
-                  onSelect={onSelect}
-                />
+                {!inSess && (
+                  <div className="hidden xl:block">
+                    <MiniCard
+                      id={id}
+                      state={state}
+                      selected={selected === id}
+                      onSelect={onSelect}
+                    />
+                  </div>
+                )}
+                <div className={inSess ? "" : "xl:hidden"}>
+                  <FigureCard
+                    id={id}
+                    state={state}
+                    human={human}
+                    veiled={veiled}
+                    inSess={inSess}
+                    selected={selected === id}
+                    onSelect={onSelect}
+                  />
+                </div>
               </div>
             ))}
           </section>

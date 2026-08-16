@@ -13,6 +13,7 @@ import Ceremony, { type OathCeremony } from "./ui/Ceremony";
 import Summary from "./ui/Summary";
 import TitleScreen from "./ui/TitleScreen";
 import TheWay, { WAY_SEEN_KEY } from "./ui/TheWay";
+import SoundToggle from "./ui/SoundToggle";
 import { PORTRAITS } from "./ui/assets";
 import { initSound, playSfx } from "./game/sound";
 import type { Action } from "./engine/engine";
@@ -202,6 +203,8 @@ function Game({ setup, onNewGame }: { setup: Setup; onNewGame: () => void }) {
           </span>
         </div>
       )}
+
+      <SoundToggle />
 
       {showWay && <TheWay onDone={() => setShowWay(false)} />}
 

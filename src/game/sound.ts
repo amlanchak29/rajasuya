@@ -20,7 +20,7 @@ export function setMuted(m: boolean): void {
   muted = m;
   localStorage.setItem(MUTE_KEY, m ? "1" : "0");
   if (master) master.gain.value = m ? 0 : 1;
-  if (ambientEl) ambientEl.volume = m ? 0 : 0.22;
+  if (ambientEl) ambientEl.volume = m ? 0 : 0.12;
 }
 
 /** Call from any user gesture; safe to call repeatedly. */
@@ -35,7 +35,7 @@ export function initSound(): void {
   if (ambientEl === null) {
     ambientEl = new Audio(ambientUrl);
     ambientEl.loop = true;
-    ambientEl.volume = muted ? 0 : 0.22;
+    ambientEl.volume = muted ? 0 : 0.12;
     void ambientEl.play().catch(() => {
       /* second gesture will retry via initSound */
     });
